@@ -2,10 +2,18 @@
 database/*.db
 database/*.sqlite
 database/*.sqlite3
+
 # informações imagens
-src/upload
+src/upload/*
+!src/upload/.gitkeep
+
 # lixo cachê do python
 __pycache__/
 *.pyc
+
 # Só pra garantir
 .env
+
+# ignora a maquina virtual
+.venv/
+a
