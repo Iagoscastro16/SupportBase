@@ -1,0 +1,2 @@
+from pil import Image
+
