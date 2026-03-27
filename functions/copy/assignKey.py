@@ -21,7 +21,7 @@ def listAssignKey():
     FROM shortcuts ORDER BY position ASC
                 ''')
     
-return cursor.fetchall()
+    return cursor.fetchall()
 
 #4. Edita a tecla de um atalho
 def editShortCutKey(id, shortCutKey):
@@ -65,7 +65,7 @@ def editPosition(id, position):
     )
     conn.commit()
     
-     return cursor.lastrowid
+    return cursor.lastrowid
                    
 #7. apagando as atribuições                   
 def deleteShortCutKey(id):
