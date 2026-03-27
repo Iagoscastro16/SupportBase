@@ -32,11 +32,11 @@ def editShortCutKey(id, shortCutKey):
     UPDATE shortcuts
     SET shortCutKey = ?
     where id = ?
-    ''', (id,shortCutKey ))
+    ''', (shortCutKey,id))
     
     conn.commit()
     
-    return cursor.lastrowid
+    return cursor.rowcount  
 
 #5. Edita a frase de um atalho
 def editPhrase(id, phrase):
@@ -46,11 +46,11 @@ def editPhrase(id, phrase):
     UPDATE shortcuts
     SET phrase = ?
     where id = ?
-    ''', (id,phrase))
+    ''', (phrase,id))
     
     conn.commit()
     
-    return cursor.lastrowid
+    return cursor.rowcount  
 
 #6. Edita a posição de um atalho             
 def editPosition(id, position):
@@ -61,11 +61,11 @@ def editPosition(id, position):
     UPDATE shortcuts
     set position = ?
     where id = ?
-    ''', (id, position)
+    ''', (position, id)
     )
     conn.commit()
     
-    return cursor.lastrowid
+    return cursor.rowcount  
                    
 #7. apagando as atribuições                   
 def deleteShortCutKey(id):
@@ -79,5 +79,5 @@ def deleteShortCutKey(id):
                    )
     conn.commit()
     
-    return cursor.lastrowid     
+    return cursor.rowcount    
 
