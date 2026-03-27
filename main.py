@@ -1,4 +1,5 @@
+# 1. Importa a função da criação das tabelas
 from tables import createTables
 
-if createTables
+# 2. Criação das tabelas se não existirem
 createTables()
