@@ -1,7 +1,7 @@
 #1. importando a biblioteca pillow, que serve para podermos mexer com imagens
 from PIL import Image
-#2. importando a função que identifica o formato da imagem
-from typeIdentify import typeIdentify
+#2. importando a função que identifica o formato da imagem, ponto significa
+from .typeIdentify import typeIdentify
 #3. importando a função que 
 from pathlib import Path
 
