@@ -9,7 +9,7 @@ def createTables():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS problems (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title VARCHAR(50) NOT NULL,
+            title TEXT NOT NULL,
             description TEXT NOT NULL,
             solution TEXT,
             imageProblem TEXT,
@@ -21,15 +21,17 @@ def createTables():
     cursor.execute('''    
         CREATE TABLE IF NOT EXISTS categories(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL
+            name TEXT NOT NULL UNIQUE
                                 )'''
                 )
 
-    #5. criação da tabela que liga o problema com a categoria
+    #5. criação da tabela que liga o problema com a categoria(primeiro cria o campo, depois a chave estrangeira, no final uma chave primaria composta)
     cursor.execute('''  
         CREATE TABLE IF NOT EXISTS problems_categories(
             problem_id INTEGER NOT NULL,
             category_id INTEGER NOT NULL,
+            FOREIGN KEY(problem_id) REFERENCES problems(id) ON DELETE CASCADE,
+            FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE,
             PRIMARY KEY (problem_id, category_id)
                                         )'''
                 )
@@ -37,7 +39,7 @@ def createTables():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key TEXT NOT NULL,
+            settingKey TEXT NOT NULL UNIQUE,
             value TEXT NOT NULL
                                 )'''
                 )
@@ -45,7 +47,7 @@ def createTables():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS shortcuts( 
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            shortCutKey TEXT NOT NULL,
+            shortCutKey TEXT NOT NULL UNIQUE,
             phrase TEXT,
             position INTEGER
                                     )'''
