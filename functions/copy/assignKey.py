@@ -1,5 +1,6 @@
 #1.  importando a conexão com o banco
 from config import conn
+
 #2. criando a função de atribuir tecla a frase
 def createAssignKey(shortCutKey,phrase):
     cursor = conn.cursor()
@@ -13,7 +14,7 @@ def createAssignKey(shortCutKey,phrase):
     return cursor.lastrowid
 
 #3.  criando a função de listar as frases e teclas
-def listAssignKey():
+def listAssignKeyByPosition():
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -23,49 +24,39 @@ def listAssignKey():
     
     return cursor.fetchall()
 
-#4. Edita a tecla de um atalho
-def editShortCutKey(id, shortCutKey):
-    cursor = conn.cursor()
+def listAssignKeyByDate(ordensEscolhida):
     
-    
-    cursor.execute('''
-    UPDATE shortcuts
-    SET shortCutKey = ?
-    where id = ?
-    ''', (shortCutKey,id))
-    
-    conn.commit()
-    
-    return cursor.rowcount  
+    ordem = None
 
-#5. Edita a frase de um atalho
-def editPhrase(id, phrase):
+    if ordensEscolhida == "maisAntiga": #trocar quando o front estiver pronto
+        ordem = "createdAt ASC"
+        
+    elif ordensEscolhida == "maisRecente": #trocar quando o front estiver pronto
+        ordem = "createdAt DESC"
+    
+    query = f"SELECT shortCutKey, phrase FROM shortcuts ORDER BY {ordem}"
+    
     cursor = conn.cursor()
     
-    cursor.execute('''
-    UPDATE shortcuts
-    SET phrase = ?
-    where id = ?
-    ''', (phrase,id))
-    
-    conn.commit()
-    
-    return cursor.rowcount  
+    cursor.execute(query)
+    return cursor.fetchall()
 
-#6. Edita a posição de um atalho             
-def editPosition(id, position):
-    
+def editAssignKey(id,shortCutKey,phrase, position):
     cursor = conn.cursor()
     
+    
     cursor.execute('''
-    UPDATE shortcuts
-    set position = ?
-    where id = ?
-    ''', (position, id)
+    UPDATE shortcuts SET
+    shortCutKey = COALESCE (?, shortCutKey),
+    phrase = COALESCE (?, phrase),
+    position = COALESCE (?, position)
+    WHERE id = ?
+                   ''',(shortCutKey,phrase,position,id)
     )
+                   
     conn.commit()
     
-    return cursor.rowcount  
+    return cursor.rowcount
                    
 #7. apagando as atribuições                   
 def deleteShortCutKey(id):
@@ -74,7 +65,7 @@ def deleteShortCutKey(id):
     
     cursor.execute('''
     DELETE FROM shortcuts
-    where id = ?
+    WHERE id = ?
     ''', (id,)               
                    )
     conn.commit()

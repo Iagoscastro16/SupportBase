@@ -9,6 +9,7 @@ def createTables():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS problems (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             title TEXT NOT NULL,
             description TEXT NOT NULL,
             solution TEXT,
@@ -47,6 +48,7 @@ def createTables():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS shortcuts( 
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             shortCutKey TEXT NOT NULL UNIQUE,
             phrase TEXT,
             position INTEGER
