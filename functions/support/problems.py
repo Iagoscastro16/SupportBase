@@ -1,13 +1,13 @@
 from config import conn
 
-def createProblem(title,description,solution,imageProblem,imageSolution):
+def createProblem(title,description,solution,image_problem,image_solution):
     
     cursor = conn.cursor()
     
     
     cursor.execute('''
-    INSERT INTO problems (title,description,solution, imageProblem, imageSolution) VALUES(?,?,?,?,?)
-                   ''',(title,description,solution,imageProblem,imageSolution))
+    INSERT INTO problems (title,description,solution, image_problem, image_solution) VALUES(%s,%s,%s,%s,%s)
+                   ''',(title,description,solution,image_problem,image_solution))
     
     conn.commit()
     
@@ -29,11 +29,11 @@ def listProblemsByDate(ordensEscolhida):
     
     if ordensEscolhida == "maisAntiga": #Trocar quanto o front estiver pronto
         
-        ordem = "createdAt ASC"
+        ordem = "created_at ASC"
         
     elif ordensEscolhida == "maisRecente": #Trocar quanto o front estiver pronto
         
-        ordem = "createdAt DESC"
+        ordem = "created_at DESC"
         
     query = f"SELECT id, title FROM problems ORDER BY {ordem}"
     
@@ -48,25 +48,26 @@ def getProblem(id):
     cursor = conn.cursor()
     
     cursor.execute('''
-    SELECT * from problems where id = ?
+    SELECT * from problems where id = %s
                    ''',(id,)
                    )
                    
-    return cursor.fetchonne()
+    return cursor.fetchone()
 
 
-def editProblems(id,title,description,solution,imageProblem,imageSolution):
+def editProblems(id,title,description,solution,image_problem,image_solution):
     cursor = conn.cursor()
     
     cursor.execute('''
     UPDATE problems SET 
-    title = COALESCE (?, title),
-    description = COALESCE (?,description),
-    solution = COALESCE (?,solution),
-    imageProblem = COALESCE (?,imageProblem),
-    imageSolution = COALESCE (?, imageSolution)
-    WHERE id = ?
-                    ''',(title,description,solution,imageProblem,imageSolution,id)
+    title = COALESCE (%s, title),
+    description = COALESCE (%s,description),
+    solution = COALESCE (%s,solution),
+    image_problem = COALESCE (%s,image_problem),
+    image_solution = COALESCE (%s, image_solution)
+    WHERE id = %s
+                    ''',(title,description,solution,image_problem,image_solution,id)
+    )
     
     conn.commit()
     
@@ -78,7 +79,7 @@ def deleteProblems(id):
     
     cursor.execute('''
     DELETE FROM problems
-    WHERE id = ?
+    WHERE id = %s
     ''',(id,)
     )
     

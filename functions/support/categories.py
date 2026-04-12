@@ -4,7 +4,7 @@ def createCategory(name):
     cursor = conn.cursor()
     
     cursor.execute('''
-    INSERT INTO categories (name) VALUES (?)
+    INSERT INTO categories (name) VALUES (%s)
     ''',(name,))
     
     conn.commit()
@@ -18,8 +18,8 @@ def editCategories(id,name):
     
     cursor.execute('''
     UPDATE categories
-    set name = ?
-    where id = ?
+    set name = %s
+    where id = %s
                 ''',(name,id)   )
     
     conn.commit()
@@ -42,7 +42,7 @@ def deleteCategory(id):
     
     cursor.execute('''
     DELETE FROM categories
-    where id = ?
+    where id = %s
                    ''',(id,)
     )
                    

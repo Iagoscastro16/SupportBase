@@ -1,2 +1,2 @@
--r requirements/base.txt
+-r base.txt
 nvidia-cufile==1.15.1.6

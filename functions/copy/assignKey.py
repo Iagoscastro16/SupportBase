@@ -2,12 +2,12 @@
 from config import conn
 
 #2. criando a função de atribuir tecla a frase
-def createAssignKey(shortCutKey,phrase):
+def createAssignKey(short_cut_key,phrase):
     cursor = conn.cursor()
     
     cursor.execute('''
-    INSERT INTO shortcuts (shortCutKey,phrase) VALUES (?,?) 
-    ''', (shortCutKey,phrase))
+    INSERT INTO shortcuts (short_cut_key,phrase) VALUES (%s,%s) 
+    ''', (short_cut_key,phrase))
     
     conn.commit()
     
@@ -18,7 +18,7 @@ def listAssignKeyByPosition():
     cursor = conn.cursor()
     
     cursor.execute('''
-    SELECT shortCutKey, phrase
+    SELECT short_cut_key, phrase
     FROM shortcuts ORDER BY position ASC
                 ''')
     
@@ -29,29 +29,29 @@ def listAssignKeyByDate(ordensEscolhida):
     ordem = None
 
     if ordensEscolhida == "maisAntiga": #trocar quando o front estiver pronto
-        ordem = "createdAt ASC"
+        ordem = "created_at ASC"
         
     elif ordensEscolhida == "maisRecente": #trocar quando o front estiver pronto
-        ordem = "createdAt DESC"
+        ordem = "created_at DESC"
     
-    query = f"SELECT shortCutKey, phrase FROM shortcuts ORDER BY {ordem}"
+    query = f"SELECT short_cut_key, phrase FROM shortcuts ORDER BY {ordem}"
     
     cursor = conn.cursor()
     
     cursor.execute(query)
     return cursor.fetchall()
 
-def editAssignKey(id,shortCutKey,phrase, position):
+def editAssignKey(id,short_cut_key,phrase, position):
     cursor = conn.cursor()
     
     
     cursor.execute('''
     UPDATE shortcuts SET
-    shortCutKey = COALESCE (?, shortCutKey),
-    phrase = COALESCE (?, phrase),
-    position = COALESCE (?, position)
-    WHERE id = ?
-                   ''',(shortCutKey,phrase,position,id)
+    short_cut_key = COALESCE (%s, short_cut_key),
+    phrase = COALESCE (%s, phrase),
+    position = COALESCE (%s, position)
+    WHERE id = %s
+                   ''',(short_cut_key,phrase,position,id)
     )
                    
     conn.commit()
@@ -65,7 +65,7 @@ def deleteShortCutKey(id):
     
     cursor.execute('''
     DELETE FROM shortcuts
-    WHERE id = ?
+    WHERE id = %s
     ''', (id,)               
                    )
     conn.commit()

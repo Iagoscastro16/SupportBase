@@ -5,7 +5,7 @@ def createCategoryProblem(problem_id,category_id):
     cursor = conn.cursor()
     
     cursor.execute('''
-    INSERT INTO problems_categories (problem_id,category_id) VALUES (?,?)
+    INSERT INTO problems_categories (problem_id,category_id) VALUES (%s,%s)
     ''',(problem_id,category_id)
                    )
     
@@ -19,7 +19,7 @@ def deleteCategoryProblem(problem_id,category_id):
     
     cursor.execute('''
     DELETE FROM problems_categories
-    where problem_id = ? and category_id = ?
+    where problem_id = %s and category_id = %s
     ''',(problem_id,category_id)              
                    )
     
@@ -34,7 +34,7 @@ def listProblemsCategories(problem_id):
     cursor.execute('''
     SELECT categories.id, categories.name from problems_categories
     INNER JOIN categories on problems_categories.category_id = categories.id
-    where problem_id = ?
+    where problem_id = %s
     ''',(problem_id,))
     
     return cursor.fetchall()
