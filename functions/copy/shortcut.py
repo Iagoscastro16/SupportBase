@@ -2,7 +2,7 @@
 from config import conn
 
 #2. criando a função de atribuir tecla a frase
-def createAssignKey(short_cut_key,phrase):
+def createshortcut(short_cut_key,phrase):
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -14,7 +14,7 @@ def createAssignKey(short_cut_key,phrase):
     return cursor.lastrowid
 
 #3.  criando a função de listar as frases e teclas
-def listAssignKeyByPosition():
+def listshortcutByPosition():
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -24,7 +24,7 @@ def listAssignKeyByPosition():
     
     return cursor.fetchall()
 
-def listAssignKeyByDate(ordensEscolhida):
+def listshortcutByDate(ordensEscolhida):
     
     ordem = None
 
@@ -41,7 +41,7 @@ def listAssignKeyByDate(ordensEscolhida):
     cursor.execute(query)
     return cursor.fetchall()
 
-def editAssignKey(id,short_cut_key,phrase, position):
+def editshortcut(id,short_cut_key,phrase, position):
     cursor = conn.cursor()
     
     
@@ -59,7 +59,7 @@ def editAssignKey(id,short_cut_key,phrase, position):
     return cursor.rowcount
                    
 #7. apagando as atribuições                   
-def deleteShortCutKey(id):
+def deleteshortcut(id):
     
     cursor = conn.cursor()
     
