@@ -1,11 +1,32 @@
 #1.  importando a conexão com o banco
 from config import conn
 
+def validatePosition(position):
+    if not isinstance(position, int):
+        return {"success": False,
+                "errorMessage": "Caractere inválido, digite um número"}
+    if position < 1 or position > 9:
+        return {"success": False,
+                "errorMessage": "Posição inválida, digite um número entre 1 e 9"}
+    cursor = conn.cursor()
+    query_verification = "SELECT id FROM shortcuts WHERE position = %s LIMIT 1"
+    cursor.execute(query_verification, (position,))
+    
+    result = cursor.fetchone() 
+    if result is not None:
+        return {"success": False,
+                "errorMessage": "Posição já ocupada, escolha outra"}
+    else:
+        return {"success": True}
+    cursor.close()
+
 #2. criando a função de atribuir tecla a frase
-def createshortcut(short_cut_key,phrase):
+def createshortcut(short_cut_key,phrase,position):
+    
     cursor = conn.cursor()
     
     cursor.execute('''
+                   
     INSERT INTO shortcuts (short_cut_key,phrase) VALUES (%s,%s) 
     ''', (short_cut_key,phrase))
     

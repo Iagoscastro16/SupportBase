@@ -48,7 +48,7 @@ def createTables():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             short_cut_key TEXT NOT NULL UNIQUE,
             phrase TEXT,
-            position INTEGER
+            position INTEGER UNIQUE CHECK (position >= 1 and position <= 9)
                                     )'''
     )
 
