@@ -123,23 +123,73 @@ def listShortcutByDate(ordensEscolhida):
         if cursor is not None:
             cursor.close()
 
-def editshortcut(id,short_cut_key,phrase, position):
-    cursor = conn.cursor()
+def EditShortcut(id,short_cut_key,phrase, position):
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+
+                        ''')
     
+def getShortcutById(cursor, shortcut_id):
     
+        
     cursor.execute('''
-    UPDATE shortcuts SET
-    short_cut_key = COALESCE (%s, short_cut_key),
-    phrase = COALESCE (%s, phrase),
-    position = COALESCE (%s, position)
-    WHERE id = %s
-                   ''',(short_cut_key,phrase,position,id)
-    )
-                   
-    conn.commit()
+         SELECT * FROM shortcuts WHERE id = %s
+                    ''',(shortcut_id,))
+        
+    shortcut = cursor.fetchone()
+    
+    return shortcut
+
+
+
+def validateEditPosition(cursor, id, position):
+    if position == None:
+        return {"success": True}
+        
+        
+    if not isinstance(position, int):
+        return {
+            "success": False,
+            "errorMessage": "Valor inválido, digite um número inteiro"
+        }
+    
+        
+    if position <1 or position >9:
+        return {"success": False,
+                "errorMessage": "Posição inválida, digite um número entre 1 e 9"}
+        
+        
+    cursor.execute('''
+        SELECT id FROM shortcuts WHERE POSITION = %s and id != %s
+                   ''',(position,id))
+    
+    
+    result = cursor.fetchone()
+    if result is not None:
+        return {
+            "success": False,
+            "errorMessage": "Posição já ocupada, escolha outra"
+            }
+
+    return {"success": True}
+    
+    
+
+    
+def updateShortcut(cursor, id,short_cut_key, phrase, position):
+    cursor.execute('''
+        UPDATE shortcut set
+        short_cut_key = COALESCE(%s, short_cut_key),
+        phrase = COALESCE(%s, phrase),
+        position = COALESCE(%s,position)
+        WHERE id = %s
+                   ''',(short_cut_key,phrase,position,id))
     
     return cursor.rowcount
-                   
+
+    
 #7. apagando as atribuições                   
 def deleteshortcut(id):
     cursor = None
