@@ -65,7 +65,8 @@ def createshortcut(short_cut_key,phrase,position):
         print(error)
         conn.rollback() 
         return {"success": False,
-                "errorMessage": "Erro ao criar atalho"}
+                "errorMessage": "Erro ao criar atalho"
+                }
     
     finally:
         if cursor is not None:
@@ -90,10 +91,13 @@ def listshortcutByPosition():
     except Exception as error:
         print(error)
         return {"success": False,
-                "errorMessage": "Erro ao listar atalhos"}
+                "errorMessage": "Erro ao listar atalhos"
+                }
     finally:
         if cursor is not None:
             cursor.close()
+
+
 
 def listShortcutByDate(ordensEscolhida):
     
@@ -103,7 +107,9 @@ def listShortcutByDate(ordensEscolhida):
     elif ordensEscolhida == "maisRecente":
         ordem = "created_at DESC"
     else:
-        return {"success": False, "errorMessage": "Ordem inválida"}
+        return {"success": False, 
+                "errorMessage": "Ordem inválida"
+                }
     
     query = f"SELECT id, created_at,short_cut_key ,phrase, position FROM shortcuts ORDER BY {ordem}"
     cursor = None
@@ -118,18 +124,52 @@ def listShortcutByDate(ordensEscolhida):
     except Exception as error:
         print(error)
         return {"success": False,
-                "errorMessage": "Erro ao listar atalhos"}
+                "errorMessage": "Erro ao listar atalhos"
+                }
     finally:
         if cursor is not None:
             cursor.close()
+
+
 
 def EditShortcut(id,short_cut_key,phrase, position):
     cursor = None
     try:
         cursor = conn.cursor()
-        cursor.execute('''
-
-                        ''')
+        shortcut = getShortcutById(cursor,id)
+        
+        if shortcut == None:
+            return {"success": False
+                    "errorMessage": "Não existe um atalho para editar"
+                    }
+        positionToEdit = validateEditPosition(cursor,id,position)
+        
+        if not positionToEdit["success"]:
+            return positionToEdit
+            
+        updateValue = updateShortcut(cursor, id,short_cut_key, phrase, position)
+            if updateValue == 0:
+                return {"success": False,
+                        "errorMessage": "Erro ao atualizar atalho"
+                        }
+            else:
+                conn.commit()
+                return {"success": True,
+                        "message": "Atalho atualizado com sucesso"
+                        }
+    
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Erro geral ao editar atalho"
+                }
+        
+    finally:
+        if cursor is not None:
+            cursor.close()
+    
+    
     
 def getShortcutById(cursor, shortcut_id):
     
@@ -158,7 +198,8 @@ def validateEditPosition(cursor, id, position):
         
     if position <1 or position >9:
         return {"success": False,
-                "errorMessage": "Posição inválida, digite um número entre 1 e 9"}
+                "errorMessage": "Posição inválida, digite um número entre 1 e 9"
+                }
         
         
     cursor.execute('''
@@ -175,7 +216,6 @@ def validateEditPosition(cursor, id, position):
 
     return {"success": True}
     
-    
 
     
 def updateShortcut(cursor, id,short_cut_key, phrase, position):
@@ -189,6 +229,7 @@ def updateShortcut(cursor, id,short_cut_key, phrase, position):
     
     return cursor.rowcount
 
+    
     
 #7. apagando as atribuições                   
 def deleteshortcut(id):
@@ -204,16 +245,19 @@ def deleteshortcut(id):
                            )
         if cursor.rowcount == 0:
             return {"success": False,
-                    "errorMessage": "Atalho não encontrado"}
+                    "errorMessage": "Atalho não encontrado"
+                    }
         
         conn.commit()
         return {"success": True,
-                "message": "Atalho deletado com sucesso"} 
+                "message": "Atalho deletado com sucesso"
+                } 
     except Exception as error:
         print(error)
         conn.rollback()
         return {"success": False,
-                "errorMessage": "Erro ao deletar atalho"}
+                "errorMessage": "Erro ao deletar atalho"
+                }
     finally:
         if cursor is not None:
             cursor.close()    
