@@ -1,4 +1,7 @@
+# importação do conn vindo do config do diretorio raiz, atribuindo ao conn, basicamente as informações do banco
 from config import conn
+
+# TODO: Refatorar depois para a adição de tratamento de erros, é o coração da aplicação
 
 def createProblem(title,description,solution,image_problem,image_solution):
     
@@ -13,6 +16,8 @@ def createProblem(title,description,solution,image_problem,image_solution):
     
     return cursor.lastrowid
 
+# Lista os problemas em ordem alfabetica
+
 def listProblemsByTitle():
     cursor = conn.cursor()
     
@@ -22,6 +27,8 @@ def listProblemsByTitle():
                    ''')
     
     return cursor.fetchall()
+
+# Lista de problemas filtrada pela data mais antiga ou mais nova
 
 def listProblemsByDate(ordensEscolhida):
     
@@ -54,6 +61,7 @@ def getProblem(id):
                    
     return cursor.fetchone()
 
+# Edição completa dos problemas 
 
 def editProblems(id,title,description,solution,image_problem,image_solution):
     cursor = conn.cursor()

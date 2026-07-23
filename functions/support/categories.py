@@ -1,4 +1,8 @@
+# importação do conn vindo do config do diretorio raiz, atribuindo ao conn, basicamente as informações do banco
 from config import conn
+
+# TODO: verificar o motivo dessa parte do código não ter o tratamento de erros com try/except/finally
+# no mais, é um CRUD básico
 
 def createCategory(name):
     cursor = conn.cursor()
@@ -26,6 +30,8 @@ def editCategories(id,name):
     
     return cursor.rowcount
 
+# retorna todas as categorias
+# TODO: Verificar se vai ser necessario a implementação de diferentes formas de visualização das categorias
 
 def listCategories():
     cursor = conn.cursor()

@@ -1,5 +1,10 @@
+# importação do conn vindo do config do diretorio raiz, atribuindo ao conn, basicamente as informações do banco
 from config import conn
 
+#TODO: Refatoração do código com tratamento de erros.
+
+
+# Fora o list, é um crud basico também
 def createCategoryProblem(problem_id,category_id):
     
     cursor = conn.cursor()
@@ -26,6 +31,8 @@ def deleteCategoryProblem(problem_id,category_id):
     conn.commit()
     
     return cursor.rowcount
+
+# Traduzindo esse inner join, ao mesmo tempo, le o id e o nome da categoria, le o id da categoria e verifica qual está batendo com o problem_id.
 
 def listProblemsCategories(problem_id):
     

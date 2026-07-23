@@ -139,7 +139,7 @@ def EditShortcut(id,short_cut_key,phrase, position):
         shortcut = getShortcutById(cursor,id)
         
         if shortcut == None:
-            return {"success": False
+            return {"success": False,
                     "errorMessage": "Não existe um atalho para editar"
                     }
         positionToEdit = validateEditPosition(cursor,id,position)
@@ -148,15 +148,15 @@ def EditShortcut(id,short_cut_key,phrase, position):
             return positionToEdit
             
         updateValue = updateShortcut(cursor, id,short_cut_key, phrase, position)
-            if updateValue == 0:
-                return {"success": False,
-                        "errorMessage": "Erro ao atualizar atalho"
-                        }
-            else:
-                conn.commit()
-                return {"success": True,
-                        "message": "Atalho atualizado com sucesso"
-                        }
+        if updateValue == 0:
+            return {"success": False,
+                    "errorMessage": "Erro ao atualizar atalho"
+                    }
+        else:
+            conn.commit()
+            return {"success": True,
+                    "message": "Atalho atualizado com sucesso"
+                    }
     
     except Exception as error:
         print(error)
