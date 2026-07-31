@@ -3,7 +3,7 @@ from config import conn
 
 # TODO: Refatorar depois para a adição de tratamento de erros, é o coração da aplicação
 
-def createProblem(title,description,solution,image_problem,image_solution):
+def create_problem(title,description,solution,image_problem,image_solution):
     
     cursor = conn.cursor()
     
@@ -30,15 +30,15 @@ def listProblemsByTitle():
 
 # Lista de problemas filtrada pela data mais antiga ou mais nova
 
-def listProblemsByDate(ordensEscolhida):
+def listProblemsByDate(ordemEscolhida):
     
     ordem = None
     
-    if ordensEscolhida == "maisAntiga": #Trocar quanto o front estiver pronto
+    if ordemEscolhida == "maisAntiga": #Trocar quanto o front estiver pronto
         
         ordem = "created_at ASC"
         
-    elif ordensEscolhida == "maisRecente": #Trocar quanto o front estiver pronto
+    elif ordemEscolhida == "maisRecente": #Trocar quanto o front estiver pronto
         
         ordem = "created_at DESC"
         
@@ -63,7 +63,7 @@ def getProblem(id):
 
 # Edição completa dos problemas 
 
-def editProblems(id,title,description,solution,image_problem,image_solution):
+def edit_problems(id,title,description,solution,image_problem,image_solution):
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -81,7 +81,7 @@ def editProblems(id,title,description,solution,image_problem,image_solution):
     
     return cursor.rowcount
     
-def deleteProblems(id):
+def delete_problems(id):
     cursor = conn.cursor()
     
     

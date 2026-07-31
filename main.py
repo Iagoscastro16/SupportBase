@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from routes.problems_categories import router as problems_categories_router
 #importação da rota de categories
 from routes.categories import router as categories_router
+# importação da rota de problems
+from routes.problems import router as problems_router
 
 
 # Criação das tabelas se não existirem
@@ -15,3 +17,4 @@ app = FastAPI()
 
 app.include_router(problems_categories_router)
 app.include_router(categories_router)
+app.include_router(problems_router)

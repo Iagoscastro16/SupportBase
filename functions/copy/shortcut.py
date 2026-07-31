@@ -160,7 +160,7 @@ def EditShortcut(id,short_cut_key,phrase, position):
     # Função orquestradora do fluxo de edição: busca o atalho, valida a posição, atualiza e commita
     # Padrão diferente do createshortcut: aqui o cursor é criado uma vez e repassado para as funções auxiliares,
     # evitando abrir e fechar cursor várias vezes dentro da mesma operação
-    #TODO: createshortcut, você notou que não há validação de short_cut_key e phrase vazios/None, Tratar disso futuramente
+    #TODO: createshortcut, não há validação de short_cut_key e phrase vazios/None, Tratar disso futuramente
     
     cursor = None
     try:
