@@ -14,7 +14,8 @@ def createTables():
             description TEXT NOT NULL,
             solution TEXT,
             image_problem TEXT,
-            image_solution TEXT
+            image_solution TEXT,
+            ativo BOOLEAN NOT NULL DEFAULT TRUE
                             )'''
                 )
 
@@ -22,7 +23,8 @@ def createTables():
     cursor.execute('''    
         CREATE TABLE IF NOT EXISTS categories(
             id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL UNIQUE,
+            ativo BOOLEAN NOT NULL DEFAULT TRUE
                                 )'''
                 )
 
