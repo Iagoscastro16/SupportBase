@@ -9,12 +9,14 @@ def create_problem(title,description,solution,image_problem,image_solution):
     
     
     cursor.execute('''
-    INSERT INTO problems (title,description,solution, image_problem, image_solution) VALUES(%s,%s,%s,%s,%s)
+    INSERT INTO problems (title,description,solution, image_problem, image_solution) VALUES(%s,%s,%s,%s,%s) RETURNING id
                    ''',(title,description,solution,image_problem,image_solution))
+
+    result = cursor.fetchone()
     
     conn.commit()
     
-    return cursor.lastrowid
+    return result[0] if result else None
 
 # Lista os problemas em ordem alfabetica
 

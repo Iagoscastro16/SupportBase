@@ -1,6 +1,10 @@
+# Importa o APIRouter, que serve para agrupar todas essas rotas e depois plugar no main.py
 from fastapi import APIRouter
+# Importação da lógica do négocio
 from functions.support.problems import create_problem, listProblemsByTitle, listProblemsByDate, getProblem, edit_problems, delete_problems
+# Optional é usado para dizer que um campo pode ser None (nulo/vazio)
 from typing import Optional
+#  BaseModel do Pydantic é a ferramenta do FastAPI para validar o corpo da requisição (JSON)
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -27,9 +31,9 @@ class Body_edit_problem(BaseModel):
 
 @router.post("/problems")
 def creationProblems(body: Body_problem):
-    creationOfProblems = create_problem(body.title,body.description, body.solution, body.image_problem, body.image_solution)
+    result = create_problem(body.title,body.description, body.solution, body.image_problem, body.image_solution)
 
-    return creationOfProblems
+    return result
 
 @router.get("/problems/{problem_id}")
 def get_problem(problem_id: int):

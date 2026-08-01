@@ -8,12 +8,14 @@ def createCategory(name):
     cursor = conn.cursor()
     
     cursor.execute('''
-    INSERT INTO categories (name) VALUES (%s)
+    INSERT INTO categories (name) VALUES (%s) RETURNING id
     ''',(name,))
     
+    result = cursor.fetchone()
+
     conn.commit()
-    
-    return cursor.lastrowid
+
+    return result[0] if result else None
 
 
 def editCategories(id,name):

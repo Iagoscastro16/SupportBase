@@ -13,30 +13,30 @@ class BodyName(BaseModel):
 
 @router.get("/categories")
 def listOfcategories():
-    listingCategories = listCategories()
+    result = listCategories()
 
-    return listingCategories
+    return result
 
 # Rota de criação das categorias
 
 @router.post("/categories")
 def creationCategory(body: BodyName):
-    creationOfCategory = createCategory(body.name)
+    result = createCategory(body.name)
 
-    return creationOfCategory
+    return result
 
 # Rota de atualizar as categorias, utilizei patch por ele deixar escolher o que atualizar, ao inves do post que sempre envia tudo
 
 @router.patch("/categories/{category_id}")
 def editingCategories(category_id: int, body: BodyName):
-    editOfCategories = editCategories(category_id, body.name)
+    result = editCategories(category_id, body.name)
 
-    return editOfCategories
+    return result
 
 # Rota de deletar a categgoria
 
 @router.delete("/categories/{category_id}")
 def deletingCategories(category_id: int):
-    deleteOfCategories = deleteCategory(category_id)
+    result = deleteCategory(category_id)
 
-    return deleteOfCategories
+    return result

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from functions.support.problems_categories import createCategoryProblem, deleteCategoryProblem, listProblemsCategories
+from functions.support.problems_categories import create_category_problem, delete_category_problem, list_problems_categories
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -13,21 +13,21 @@ class CategoryProblemBody(BaseModel):
 
 @router.get("/problems/{problem_id}/categories")
 def listOfCategoryProblems(problem_id:int):
-    listResult = listProblemsCategories(problem_id)
+    result = list_problems_categories(problem_id)
 
-    return listResult
+    return result
 
 
 @router.delete("/problems/{problem_id}/categories/{category_id}")
 def deleteOfProblemCategory(problem_id:int,category_id:int):
-    eraseResult = deleteCategoryProblem(problem_id,category_id)
+    result = delete_category_problem(problem_id,category_id)
 
-    return eraseResult
+    return result
 
 # Utilização do BaseModel para a criação da atribuição na rota de atribuir categories a problems
 
 @router.post("/problems/{problem_id}/categories")
 def creationCategoryProblem(problem_id:int,body: CategoryProblemBody):
-    creationOfCategoryProblem = createCategoryProblem(problem_id,body.category_id)
+    result = create_category_problem(problem_id,body.category_id)
 
-    return creationOfCategoryProblem 
+    return result

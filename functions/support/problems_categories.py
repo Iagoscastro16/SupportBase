@@ -5,7 +5,7 @@ from config import conn
 
 
 # Fora o list, é um crud basico também
-def createCategoryProblem(problem_id,category_id):
+def create_category_problem(problem_id,category_id):
     
     cursor = conn.cursor()
     
@@ -13,12 +13,12 @@ def createCategoryProblem(problem_id,category_id):
     INSERT INTO problems_categories (problem_id,category_id) VALUES (%s,%s)
     ''',(problem_id,category_id)
                    )
-    
+
     conn.commit()
     
-    return cursor.lastrowid
+    return cursor.rowcount
 
-def deleteCategoryProblem(problem_id,category_id):
+def delete_category_problem(problem_id,category_id):
     
     cursor = conn.cursor()
     
@@ -34,7 +34,7 @@ def deleteCategoryProblem(problem_id,category_id):
 
 # Traduzindo esse inner join, ao mesmo tempo, le o id e o nome da categoria, le o id da categoria e verifica qual está batendo com o problem_id.
 
-def listProblemsCategories(problem_id):
+def list_problems_categories(problem_id):
     
     cursor = conn.cursor()
     
