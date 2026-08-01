@@ -119,16 +119,16 @@ def listshortcutByPosition():
 
 
 
-def listShortcutByDate(ordensEscolhida):
+def listShortcutByDate(ordem_escolhida):
     # Essa função permite listar ordenando por data — mais antiga primeiro ou mais recente primeiro
     
     # Mapeia a escolha do usuário para o trecho SQL correspondente
     # IMPORTANTE: como o controle é feito com if/elif (e não concatenando input direto), não há risco de SQL injection aqui.
     # O f-string só recebe uma das duas strings fixas que nós mesmos definimos.
     ordem = None
-    if ordensEscolhida == "maisAntiga":
+    if ordem_escolhida == "maisAntiga":
         ordem = "created_at ASC"
-    elif ordensEscolhida == "maisRecente":
+    elif ordem_escolhida == "maisRecente":
         ordem = "created_at DESC"
     else:
         return {"success": False, 
