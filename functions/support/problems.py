@@ -5,30 +5,46 @@ from config import conn
 
 def create_problem(title,description,solution,image_problem,image_solution):
     
-    cursor = conn.cursor()
+    try:
+        with conn.cursor() as cursor:
     
-    
-    cursor.execute('''
-    INSERT INTO problems (title,description,solution, image_problem, image_solution) VALUES(%s,%s,%s,%s,%s) RETURNING id
-                   ''',(title,description,solution,image_problem,image_solution))
+            cursor.execute('''
+            INSERT INTO problems (title,description,solution, image_problem, image_solution) VALUES(%s,%s,%s,%s,%s) RETURNING id
+                        ''',(title,description,solution,image_problem,image_solution))
 
-    result = cursor.fetchone()
-    
-    conn.commit()
-    
-    return result[0] if result else None
+            result = cursor.fetchone()
+            
+            conn.commit()
+            
+            return result[0] if result else None
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Não foi possível criar um problema novo"}
 
 # Lista os problemas em ordem alfabetica
 
-def listProblemsByTitle():
-    cursor = conn.cursor()
+def listProblemsByTitle(incluir_inativos=False):
+
+    if incluir_inativos:
+        query = "SELECT id, title, ativo FROM problems order by title ASC"
+    else:
+        query = "SELECT id, title, ativo FROM problems WHERE ativo = True order by title ASC"
+    try:
+        with conn.cursor() as cursor:
     
-    cursor.execute('''
-    SELECT id, title 
-    FROM problems order by title ASC
-                   ''')
-    
-    return cursor.fetchall()
+            cursor.execute(query)
+            data = cursor.fetchall()
+            
+            return {"success": True,
+                    "data":data}
+    except Exception as error:
+        print(error)
+        conn.rollback()
+
+        return {"success": False,
+                "errorMessage": "Erro ao listar os problemas pelo titulo"}
 
 # Lista de problemas filtrada pela data mais antiga ou mais nova
 
@@ -54,47 +70,63 @@ def listProblemsByDate(ordemEscolhida):
 
 def getProblem(id):
     
-    cursor = conn.cursor()
+    try:
+        with conn.cursor() as cursor:
     
-    cursor.execute('''
-    SELECT * from problems where id = %s
-                   ''',(id,)
-                   )
-                   
-    return cursor.fetchone()
+            cursor.execute('''
+            SELECT id,created_at,title,description,solution,image_problem,image_solution, ativo from problems where id = %s
+                        ''',(id,)
+                        )
+                        
+            return cursor.fetchone()
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage":"Erro ao listar problemas"}
 
 # Edição completa dos problemas 
 
 def edit_problems(id,title,description,solution,image_problem,image_solution):
-    cursor = conn.cursor()
+    try:
+        with conn.cursor() as cursor:
     
-    cursor.execute('''
-    UPDATE problems SET 
-    title = COALESCE (%s, title),
-    description = COALESCE (%s,description),
-    solution = COALESCE (%s,solution),
-    image_problem = COALESCE (%s,image_problem),
-    image_solution = COALESCE (%s, image_solution)
-    WHERE id = %s
-                    ''',(title,description,solution,image_problem,image_solution,id)
-    )
-    
-    conn.commit()
-    
-    return cursor.rowcount
+            cursor.execute('''
+            UPDATE problems SET 
+            title = COALESCE (%s, title),
+            description = COALESCE (%s,description),
+            solution = COALESCE (%s,solution),
+            image_problem = COALESCE (%s,image_problem),
+            image_solution = COALESCE (%s, image_solution)
+            WHERE id = %s
+                            ''',(title,description,solution,image_problem,image_solution,id)
+            )
+
+            conn.commit()
+            return cursor.rowcount
+            
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Erro ao editar problema"}
     
 def delete_problems(id):
-    cursor = conn.cursor()
-    
-    
-    cursor.execute('''
-    UPDATE PROBLEMS
-    SET ativo = FALSE
-    WHERE id = %s
-    ''',(id,)
-    )
-    
-    conn.commit()
-    
-    
-    return cursor.rowcount
+    try:
+        with conn.cursor() as cursor:
+
+            cursor.execute('''
+            UPDATE PROBLEMS
+            SET ativo = FALSE
+            WHERE id = %s
+            ''',(id,)
+            )
+            
+            conn.commit()
+            return cursor.rowcount
+        
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Não foi possivel inativar o problema"}

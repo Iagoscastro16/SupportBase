@@ -62,7 +62,7 @@ def list_categories(incluir_inativo=False):
         with conn.cursor() as cursor:
     
             cursor.execute(query)
-            data=cursor.fetchall()
+            data = cursor.fetchall()
             return {"success": True,
                     "data": data}
     except Exception as error:
