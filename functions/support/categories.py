@@ -4,7 +4,7 @@ from config import conn
 # TODO: verificar o motivo dessa parte do código não ter o tratamento de erros com try/except/finally
 # no mais, é um CRUD básico
 
-def createCategory(name):
+def create_category(name):
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -18,7 +18,7 @@ def createCategory(name):
     return result[0] if result else None
 
 
-def editCategories(id,name):
+def edit_categories(id,name):
     
     cursor = conn.cursor()
     
@@ -35,21 +35,33 @@ def editCategories(id,name):
 # retorna todas as categorias
 # TODO: Verificar se vai ser necessario a implementação de diferentes formas de visualização das categorias
 
-def listCategories():
+def list_categories(incluir_inativo=False):
+
+    if incluir_inativo:
+        query = "SELECT id, ativo ,name FROM categories"
+
+    else:
+        query = "SELECT id, name, ativo FROM categories WHERE ativo = True"
+
+
+    try:
+        with conn.cursor() as cursor:
+    
+            cursor.execute(query)
+            data=cursor.fetchall()
+            return {"success": True,
+                    "data": data}
+    except Exception as error:
+        print(error)
+        return{"success": False,
+               "errorMessage": "Erro ao listar categorias"}
+
+def delete_category(id):
     cursor = conn.cursor()
     
     cursor.execute('''
-    SELECT id, name FROM categories
-                   ''')
-    
-    return cursor.fetchall()
-
-
-def deleteCategory(id):
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    DELETE FROM categories
+    UPDATE categories 
+    SET ativo = FALSE
     where id = %s
                    ''',(id,)
     )

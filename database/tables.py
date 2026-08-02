@@ -10,11 +10,11 @@ def createTables():
     CREATE TABLE IF NOT EXISTS problems (
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            solution TEXT,
-            image_problem TEXT,
-            image_solution TEXT,
+            title VARCHAR(80) NOT NULL,
+            description VARCHAR(400) NOT NULL,
+            solution VARCHAR(800),
+            image_problem VARCHAR(255),
+            image_solution VARCHAR(255),
             ativo BOOLEAN NOT NULL DEFAULT TRUE
                             )'''
                 )
@@ -23,7 +23,7 @@ def createTables():
     cursor.execute('''    
         CREATE TABLE IF NOT EXISTS categories(
             id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE,
+            name VARCHAR(80) NOT NULL UNIQUE,
             ativo BOOLEAN NOT NULL DEFAULT TRUE
                                 )'''
                 )
@@ -48,8 +48,8 @@ def createTables():
         CREATE TABLE IF NOT EXISTS shortcuts( 
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            short_cut_key TEXT NOT NULL UNIQUE,
-            phrase TEXT,
+            short_cut_key VARCHAR(40) NOT NULL UNIQUE,
+            phrase VARCHAR(255),
             position INTEGER UNIQUE CHECK (position >= 1 and position <= 9)
                                     )'''
     )

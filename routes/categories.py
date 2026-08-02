@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from functions.support.categories import createCategory, editCategories, listCategories, deleteCategory
+from functions.support.categories import create_category, edit_categories, list_categories, delete_category
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -13,7 +13,7 @@ class BodyName(BaseModel):
 
 @router.get("/categories")
 def listOfcategories():
-    result = listCategories()
+    result = list_categories()
 
     return result
 
@@ -21,7 +21,7 @@ def listOfcategories():
 
 @router.post("/categories")
 def creationCategory(body: BodyName):
-    result = createCategory(body.name)
+    result = create_category(body.name)
 
     return result
 
@@ -29,7 +29,7 @@ def creationCategory(body: BodyName):
 
 @router.patch("/categories/{category_id}")
 def editingCategories(category_id: int, body: BodyName):
-    result = editCategories(category_id, body.name)
+    result = edit_categories(category_id, body.name)
 
     return result
 
@@ -37,6 +37,6 @@ def editingCategories(category_id: int, body: BodyName):
 
 @router.delete("/categories/{category_id}")
 def deletingCategories(category_id: int):
-    result = deleteCategory(category_id)
+    result = delete_category(category_id)
 
     return result

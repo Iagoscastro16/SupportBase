@@ -88,7 +88,8 @@ def delete_problems(id):
     
     
     cursor.execute('''
-    DELETE FROM problems
+    UPDATE PROBLEMS
+    SET ativo = FALSE
     WHERE id = %s
     ''',(id,)
     )
