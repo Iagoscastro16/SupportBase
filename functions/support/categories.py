@@ -5,32 +5,46 @@ from config import conn
 # no mais, é um CRUD básico
 
 def create_category(name):
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    INSERT INTO categories (name) VALUES (%s) RETURNING id
-    ''',(name,))
-    
-    result = cursor.fetchone()
+    try:
+        with conn.cursor() as cursor:
+        
+            cursor.execute('''
+            INSERT INTO categories (name) VALUES (%s) RETURNING id
+            ''',(name,))
+            
+            result = cursor.fetchone()
 
-    conn.commit()
+            conn.commit()
 
-    return result[0] if result else None
+            return result[0] if result else None
+    except Exception as error:
+        print(error)
+        conn.rollback()
+
+    return {"success": False,
+            "errorMessage": "Ocorreu um erro na criação da categoria"}
 
 
 def edit_categories(id,name):
     
-    cursor = conn.cursor()
+    try:
+        with conn.cursor() as cursor:
     
-    cursor.execute('''
-    UPDATE categories
-    set name = %s
-    where id = %s
-                ''',(name,id)   )
+            cursor.execute('''
+            UPDATE categories
+            set name = %s
+            where id = %s
+                        ''',(name,id)   )
+            
+            conn.commit()
+
+            return cursor.rowcount
+
+    except Exception as error:
+            print(error)
+            conn.rollback()
     
-    conn.commit()
-    
-    return cursor.rowcount
+
 
 # retorna todas as categorias
 # TODO: Verificar se vai ser necessario a implementação de diferentes formas de visualização das categorias
@@ -53,19 +67,29 @@ def list_categories(incluir_inativo=False):
                     "data": data}
     except Exception as error:
         print(error)
+        conn.rollback()
+
         return{"success": False,
                "errorMessage": "Erro ao listar categorias"}
 
 def delete_category(id):
-    cursor = conn.cursor()
+    try:
+        with conn.cursor() as cursor:
+            
+            cursor.execute('''
+            UPDATE categories 
+            SET ativo = FALSE
+            where id = %s
+                        ''',(id,)
+            )
+                        
+            conn.commit()
+
+            return cursor.rowcount
+        
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Não foi possível inativar a categoria"}
     
-    cursor.execute('''
-    UPDATE categories 
-    SET ativo = FALSE
-    where id = %s
-                   ''',(id,)
-    )
-                   
-    conn.commit()
-    
-    return cursor.rowcount
