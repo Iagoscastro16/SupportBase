@@ -52,6 +52,9 @@ def validatePosition(position):
 
 #2. criando a função de atribuir tecla a frase
 def createshortcut(short_cut_key,phrase,position):
+    if not short_cut_key or not phrase:
+        return {"success": False,
+                    "errorMessage": "atalho ou frase não podem ser vazios"}
     #anotação pq foi dificil fazer, aqui eu estou aproveitando o que veio da função validatePosition, ele já verifica o número do position e no dicionario eu já chamo o erro
     # Reprova cedo: se a posição for inválida, nem chega a abrir conexão para o INSERT
     if position is not None:
@@ -60,6 +63,7 @@ def createshortcut(short_cut_key,phrase,position):
         # Se validatePosition retornou success False, repassa o erro direto para quem chamou
         if not result["success"]:
             return result
+
     
     # Observação: aqui não há validação de short_cut_key e phrase — se vierem vazios ou None, vão entrar no banco assim.
     # Vale pensar em adicionar uma validação tipo "if not short_cut_key or not phrase: return erro"
@@ -211,7 +215,7 @@ def getShortcutById(cursor, shortcut_id):
     # Retorna a linha completa do atalho — útil tanto para validar existência quanto para leitura de campos
         
     cursor.execute('''
-         SELECT * FROM shortcuts WHERE id = %s
+         SELECT id, created_at,short_cut_key,phrase,position FROM shortcuts WHERE id = %s
                     ''',(shortcut_id,))
         
     shortcut = cursor.fetchone()

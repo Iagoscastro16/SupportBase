@@ -49,7 +49,7 @@ def createTables():
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             short_cut_key VARCHAR(40) NOT NULL UNIQUE,
-            phrase VARCHAR(255),
+            phrase VARCHAR(255) NOT NULL,
             position INTEGER UNIQUE CHECK (position >= 1 and position <= 9)
                                     )'''
     )
