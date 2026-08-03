@@ -48,9 +48,17 @@ def listProblemsByTitle(incluir_inativos=False):
 
 # Lista de problemas filtrada pela data mais antiga ou mais nova
 
-def listProblemsByDate(ordemEscolhida):
+def listProblemsByDate(ordemEscolhida, incluir_inativo=False):
     
     ordem = None
+    filtro = None
+
+    if incluir_inativo:
+        filtro = ""
+
+    else:
+        filtro = ("WHERE ativo = True")
+        
     
     if ordemEscolhida == "maisAntiga": #Trocar quanto o front estiver pronto
         
@@ -59,13 +67,23 @@ def listProblemsByDate(ordemEscolhida):
     elif ordemEscolhida == "maisRecente": #Trocar quanto o front estiver pronto
         
         ordem = "created_at DESC"
+
+    else:
+        return {"success": False,
+                "errorMessage":"Ordem escolhida inválida"}
         
-    query = f"SELECT id, title FROM problems ORDER BY {ordem}"
+    query = f"SELECT id, title, ativo FROM problems {filtro} ORDER BY {ordem}"
+
+    try:
+        with conn.cursor() as cursor:
     
-    cursor = conn.cursor()
-    
-    cursor.execute(query)
-    return cursor.fetchall()
+            cursor.execute(query)
+            return cursor.fetchall()
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return{"success": False,
+               "errorMessage": "Erro ao listar problemas pela data"}
 
 
 def getProblem(id):
