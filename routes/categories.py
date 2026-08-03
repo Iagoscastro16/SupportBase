@@ -12,8 +12,8 @@ class BodyName(BaseModel):
 # Rota de listar as categorias
 
 @router.get("/categories")
-def listOfcategories():
-    result = list_categories()
+def listOfcategories(incluir_inativo: bool = False):
+    result = list_categories(incluir_inativo)
 
     return result
 

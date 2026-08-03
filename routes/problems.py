@@ -36,20 +36,20 @@ def creationProblems(body: Body_problem):
     return result
 
 @router.get("/problems/{problem_id}")
-def get_problem(problem_id: int):
+def get_problem(problem_id: int,):
     result = get_problem(problem_id)
 
     return result
 
 @router.get("/problems")
-def list_problem_by_title():
-    result = listProblemsByTitle()
+def list_problem_by_title(incluir_inativo: bool = False):
+    result = listProblemsByTitle(incluir_inativo)
 
     return result
 
 @router.get("/problems/by-date")
-def list_problem_by_date(ordemEscolhida: str):
-    result = listProblemsByDate(ordemEscolhida)
+def list_problem_by_date(ordemEscolhida: str, incluir_inativo: bool = False):
+    result = listProblemsByDate(ordemEscolhida, incluir_inativo)
 
     return result
 
