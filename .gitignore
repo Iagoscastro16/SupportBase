@@ -17,3 +17,5 @@ __pycache__/
 # ignora a maquina virtual
 .venv/
 a
+#ignora o htmx
+src/static/htmx.min.js
