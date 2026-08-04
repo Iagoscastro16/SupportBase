@@ -86,7 +86,7 @@ def listProblemsByDate(ordemEscolhida, incluir_inativo=False):
                "errorMessage": "Erro ao listar problemas pela data"}
 
 
-def getProblem(id):
+def get_problem(id):
     
     try:
         with conn.cursor() as cursor:
