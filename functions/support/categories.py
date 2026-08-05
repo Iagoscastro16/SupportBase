@@ -16,7 +16,7 @@ def create_category(name):
 
             conn.commit()
 
-            return result[0] if result else None
+            return result["id"] if result else None
     except Exception as error:
         print(error)
         conn.rollback()

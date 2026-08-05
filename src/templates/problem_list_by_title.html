@@ -6,6 +6,18 @@
     <title>Problemas</title>
 </head>
 <body>
+    <div id="lista-problemas">
+        <ul>
+            {% for problema in problemas %}
+            <li hx-get="/ui/problems/{{ problema['id'] }}" hx-target="#detalhe-problema" hx-swap="innerHTML">
+                {{ problema['title'] }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="detalhe-problema">
+
+    </div>
     <script src="/static/htmx.min.js"></script>
 </body>
 </html>

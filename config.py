@@ -1,6 +1,8 @@
 # 1. banco que será utilizado
 import os, psycopg2
 
+from psycopg2.extras import RealDictCursor
+
 # 2. biblioteca para armazenar caminhos
 import os
 from pathlib import Path
@@ -21,5 +23,6 @@ conn = psycopg2.connect(
     user=db_user,
     password=db_password,
     host=db_host,
-    port=db_port
+    port=db_port,
+    cursor_factory=RealDictCursor
 )
