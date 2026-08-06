@@ -15,6 +15,7 @@ from routes.shortcut import router as shortcut_router
 
 from routes.ui.problems import router as ui_problems_router
 
+from routes.ui.index import router as ui_index
 
 
 # Criação das tabelas se não existirem
@@ -29,3 +30,4 @@ app.include_router(categories_router)
 app.include_router(problems_router)
 app.include_router(shortcut_router)
 app.include_router(ui_problems_router)
+app.include_router(ui_index)
