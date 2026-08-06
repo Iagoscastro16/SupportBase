@@ -43,7 +43,8 @@ def delete_category_problem(problem_id,category_id):
         conn.rollback()
         return {"success": False,
                 "errorMessage": "Erro ao excluir vinculo"}
-# Traduzindo esse inner join, ao mesmo tempo, le o id e o nome da categoria, le o id da categoria e verifica qual está batendo com o problem_id.
+
+    # Traduzindo esse inner join, ao mesmo tempo, le o id e o nome da categoria, le o id da categoria e verifica qual está batendo com o problem_id.
 
 def list_problems_categories(problem_id):
     
