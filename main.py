@@ -13,6 +13,8 @@ from routes.problems import router as problems_router
 # importação da rota shortcut
 from routes.shortcut import router as shortcut_router 
 
+from routes.ui.problems import router as ui_problems_router
+
 
 
 # Criação das tabelas se não existirem
@@ -26,3 +28,4 @@ app.include_router(problems_categories_router)
 app.include_router(categories_router)
 app.include_router(problems_router)
 app.include_router(shortcut_router)
+app.include_router(ui_problems_router)

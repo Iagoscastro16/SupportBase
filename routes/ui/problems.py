@@ -12,13 +12,17 @@ router = APIRouter()
 @router.get("/ui/problems")
 def show_problems_list(request: Request):
     result = listProblemsByTitle()
-    return templates.TemplateResponse("problem_list_by_title.html",{
-        "request": request,
-        "problemas":result["data"]
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="problem_list_by_title.html",
+        context={"problemas": result["data"]}
+    )
 
 @router.get("/ui/problems/{problem_id}")
 def getting_problems(request: Request, problem_id:int):
     result = get_problem(problem_id)
-
-    result = templates.TemplateResponse("")
+    return templates.TemplateResponse(
+        request=request,
+        name="problem_detail.html",
+        context={"problema":result}
+    )
