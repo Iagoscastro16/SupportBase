@@ -55,7 +55,7 @@ def list_categories(incluir_inativo=False):
         query = "SELECT id, ativo ,name FROM categories"
 
     else:
-        query = "SELECT id, name, ativo FROM categories WHERE ativo = True"
+        query = "SELECT id, name, ativo FROM categories WHERE ativo = True" 
 
 
     try:
