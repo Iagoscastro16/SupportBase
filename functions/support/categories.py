@@ -72,6 +72,23 @@ def list_categories(incluir_inativo=False):
         return{"success": False,
                "errorMessage": "Erro ao listar categorias"}
 
+def get_category_id(id):
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+            SELECT id,name,ativo from categories where id = %s
+            ''',(id,)
+            )
+
+            return cursor.fetchone()
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+        "errorMessage":"Erro ao listar categoria"}
+
+
 def delete_category(id):
     try:
         with conn.cursor() as cursor:
