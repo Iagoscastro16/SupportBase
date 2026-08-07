@@ -14,7 +14,7 @@ def show_problems_list(request: Request):
     result = listProblemsByTitle()
     return templates.TemplateResponse(
         request=request,
-        name="problem_list_by_title.html",
+        name="pages/problem_list_by_title.html",
         context={"problemas": result["data"]}
     )
 
@@ -23,6 +23,6 @@ def getting_problems(request: Request, problem_id:int):
     result = get_problem(problem_id)
     return templates.TemplateResponse(
         request=request,
-        name="problem_detail.html",
+        name="partials/problem_detail.html",
         context={"problema":result}
     )

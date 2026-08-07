@@ -11,7 +11,7 @@ def show_categories_list(request: Request):
     result = list_categories()
     return templates.TemplateResponse(
         request=request,
-        name="listing_categories.html",
+        name="pages/listing_categories.html",
         context={"categorias":result["data"]}
     )
 
@@ -21,6 +21,6 @@ def getting_category(request: Request, category_id: int):
 
     return templates.TemplateResponse(
         request=request,
-        name="get_category_id.html",
+        name="partials/get_category_id.html",
         context={"categoria":result}
     )
