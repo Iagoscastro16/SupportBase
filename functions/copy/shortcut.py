@@ -105,7 +105,7 @@ def listshortcutByPosition():
         # NULLS LAST é o detalhe legal aqui: joga os atalhos sem posição para o final da lista,
         # mantendo os que têm posição numerada aparecendo primeiro (mais organizado para o usuário)
         cursor.execute('''
-        SELECT short_cut_key, phrase, position
+        SELECT id, short_cut_key, phrase, position
         FROM shortcuts ORDER BY position ASC NULLS LAST
                     ''')
         
@@ -279,6 +279,18 @@ def updateShortcut(cursor, id,short_cut_key, phrase, position):
     # rowcount informa quantas linhas foram afetadas pelo UPDATE — 0 significa que o id não foi encontrado
     return cursor.rowcount
 
+def get_shortcut(id):
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+            SELECT id, created_at, short_cut_key, phrase, position FROM shortcuts WHERE id = %s
+            ''', (id,))
+            return cursor.fetchone()
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Erro ao buscar atalho"}
     
     
 #7. apagando as atribuições                   
