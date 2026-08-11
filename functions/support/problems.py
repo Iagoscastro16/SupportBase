@@ -28,9 +28,23 @@ def create_problem(title,description,solution,image_problem,image_solution):
 def listProblemsByTitle(incluir_inativos=False):
 
     if incluir_inativos:
-        query = "SELECT id, title, ativo FROM problems order by title ASC"
+        query = '''SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
+        FROM problems p
+        LEFT JOIN problems_categories pc ON pc.problem_id = p.id
+        LEFT JOIN categories c ON c.id = pc.category_id
+        GROUP BY p.id, p.title, p.ativo
+        ORDER BY p.title ASC'''
+        
     else:
-        query = "SELECT id, title, ativo FROM problems WHERE ativo = True order by title ASC"
+
+        query = '''SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
+        FROM problems p
+        LEFT JOIN problems_categories pc ON pc.problem_id = p.id
+        LEFT JOIN categories c ON c.id = pc.category_id
+        WHERE p.ativo = True
+        GROUP BY p.id, p.title, p.ativo
+        ORDER BY p.title ASC'''
+
     try:
         with conn.cursor() as cursor:
     
