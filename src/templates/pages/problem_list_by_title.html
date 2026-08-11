@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problemas</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Problemas{% endblock %}
+{% block content %}
     <div id="lista-problemas">
         <ul>
             {% for problema in problemas %}
@@ -16,8 +11,5 @@
         </ul>
     </div>
     <div id="detalhe-problema">
-
     </div>
-    <script src="/static/htmx.min.js"></script>
-</body>
-</html>
+    {% endblock %}
