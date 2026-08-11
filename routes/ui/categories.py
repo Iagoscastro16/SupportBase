@@ -7,7 +7,7 @@ from src.templates_config import templates
 router = APIRouter()
 
 @router.get("/ui/categories")
-def show_categories_list(request: Request):
+def list_categories_with_problems(request: Request):
     result = list_categories()
     return templates.TemplateResponse(
         request=request,

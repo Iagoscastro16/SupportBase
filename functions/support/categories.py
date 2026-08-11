@@ -50,14 +50,18 @@ def edit_categories(id,name):
 # TODO: Verificar se vai ser necessario a implementação de diferentes formas de visualização das categorias
 
 def list_categories(incluir_inativo=False):
-
-    if incluir_inativo:
-        query = "SELECT id, ativo ,name FROM categories"
-
-    else:
-        query = "SELECT id, name, ativo FROM categories WHERE ativo = True" 
-
-
+    filtro = "" if incluir_inativo else "WHERE c.ativo = True"
+    query = f"""
+    SELECT c.id, c.name, c.ativo,
+           COUNT(p.id) AS total_problemas,
+           STRING_AGG(p.title, '||') FILTER (WHERE p.id IS NOT NULL) AS titulos
+    FROM categories c
+    LEFT JOIN problems_categories pc ON pc.category_id = c.id
+    LEFT JOIN problems p ON p.id = pc.problem_id AND p.ativo = True
+    {filtro}
+    GROUP BY c.id, c.name, c.ativo
+    ORDER BY c.name ASC
+    """
     try:
         with conn.cursor() as cursor:
     
