@@ -1,0 +1,13 @@
+<ul class="space-y-3">
+    {% for problema in problemas %}
+    <li hx-get="/ui/problems/{{ problema['id'] }}" hx-target="#detalhe-problema" hx-swap="innerHTML"
+        class="bg-gray-900 border border-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-800 transition-colors">
+
+        {% if problema['categorias'] %}
+        <span class="text-xs text-gray-500">{{ problema['categorias'] }}</span>
+        {% endif %}
+
+        <p class="text-white font-medium mt-1">{{ problema['title'] }}</p>
+    </li>
+    {% endfor %}
+</ul>
