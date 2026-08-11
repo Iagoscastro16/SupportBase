@@ -142,6 +142,29 @@ def edit_problems(id,title,description,solution,image_problem,image_solution):
         conn.rollback()
         return {"success": False,
                 "errorMessage": "Erro ao editar problema"}
+
+
+def search_problems(query):
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+            SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
+            FROM problems p
+            LEFT JOIN problems_categories pc ON pc.problem_id = p.id
+            LEFT JOIN categories c ON c.id = pc.category_id
+            WHERE p.ativo = True AND (p.title ILIKE %s OR p.description ILIKE %s)
+            GROUP BY p.id, p.title, p.ativo
+            ORDER BY p.title ASC
+            ''', (f"%{query}%", f"%{query}%"))
+
+            data = cursor.fetchall()
+
+            return {"success": True, "data": data}
+        
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False, "errorMessage": "Erro ao buscar problemas"}
     
 def delete_problems(id):
     try:

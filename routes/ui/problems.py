@@ -1,7 +1,7 @@
 # Importa o APIRouter, que serve para agrupar todas essas rotas e depois plugar no main.py
 from fastapi import APIRouter, Request
 # Importação da lógica do négocio
-from functions.support.problems import listProblemsByTitle,get_problem
+from functions.support.problems import listProblemsByTitle,get_problem, search_problems
 
 from src.templates_config import templates
 
@@ -25,4 +25,14 @@ def getting_problems(request: Request, problem_id:int):
         request=request,
         name="partials/problem_detail.html",
         context={"problema":result}
+    )
+
+@router.get("/ui/problems/search")
+def search_problems_ui (request:Request, query: str = ""):
+    result = search_problems(query)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/search_problem.html",
+        context={"problemas":result["data"]}
     )
