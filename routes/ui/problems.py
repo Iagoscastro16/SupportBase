@@ -18,14 +18,6 @@ def show_problems_list(request: Request):
         context={"problemas": result["data"]}
     )
 
-@router.get("/ui/problems/{problem_id}")
-def getting_problems(request: Request, problem_id:int):
-    result = get_problem(problem_id)
-    return templates.TemplateResponse(
-        request=request,
-        name="partials/problem_detail.html",
-        context={"problema":result}
-    )
 
 @router.get("/ui/problems/search")
 def search_problems_ui (request:Request, query: str = ""):
@@ -35,4 +27,13 @@ def search_problems_ui (request:Request, query: str = ""):
         request=request,
         name="partials/search_problem.html",
         context={"problemas":result["data"]}
+    )
+
+@router.get("/ui/problems/{problem_id}")
+def getting_problems(request: Request, problem_id:int):
+    result = get_problem(problem_id)
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/problem_detail.html",
+        context={"problema":result}
     )
