@@ -12,7 +12,7 @@ def list_categories_with_problems(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="pages/listing_categories.html",
-        context={"categorias":result["data"]}
+        context={"categorias":result["data"],"pagina_ativa":"categories"}
     )
 
 @router.get("/ui/categories/{category_id}")

@@ -12,7 +12,7 @@ def list_shortcut_by_position(request:Request):
     return templates.TemplateResponse(
         request=request,
         name="pages/shortcut_by_position.html",
-        context={"atalhos":result["data"]}
+        context={"atalhos":result["data"],"pagina_ativa":"shortcuts"}
     )
 
 @router.get("/ui/shortcuts/{shortcut_id}")

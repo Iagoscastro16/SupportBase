@@ -15,7 +15,7 @@ def show_problems_list(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="pages/problem_list_by_title.html",
-        context={"problemas": result["data"]}
+        context={"problemas": result["data"], "pagina_ativa":"problems"}
     )
 
 
