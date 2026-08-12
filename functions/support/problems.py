@@ -101,21 +101,24 @@ def listProblemsByDate(ordemEscolhida, incluir_inativo=False):
 
 
 def get_problem(id):
-    
     try:
         with conn.cursor() as cursor:
-    
             cursor.execute('''
-            SELECT id,created_at,title,description,solution,image_problem,image_solution, ativo from problems where id = %s
-                        ''',(id,)
-                        )
-                        
+            SELECT p.id, p.created_at, p.title, p.description, p.solution,
+                   p.image_problem, p.image_solution, p.ativo,
+                   STRING_AGG(c.name, ', ') AS categorias
+            FROM problems p
+            LEFT JOIN problems_categories pc ON pc.problem_id = p.id
+            LEFT JOIN categories c ON c.id = pc.category_id
+            WHERE p.id = %s
+            GROUP BY p.id, p.created_at, p.title, p.description, p.solution,
+                     p.image_problem, p.image_solution, p.ativo
+            ''', (id,))
             return cursor.fetchone()
     except Exception as error:
         print(error)
         conn.rollback()
-        return {"success": False,
-                "errorMessage":"Erro ao listar problemas"}
+        return {"success": False, "errorMessage": "Erro ao listar problemas"}
 
 # Edição completa dos problemas 
 

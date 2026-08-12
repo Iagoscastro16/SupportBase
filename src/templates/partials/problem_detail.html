@@ -1,2 +1,5 @@
-<h2 class="text-lg font-semibold text-white">{{ problema['title'] }}</h2>
+{% if problema['categorias'] %}
+<span class="text-xs text-gray-500">{{ problema['categorias'] }}</span>
+{% endif %}
+<h2 class="text-lg font-semibold text-white mt-1">{{ problema['title'] }}</h2>
 <p class="text-gray-300 mt-2">{{ problema['description'] }}</p>
