@@ -1,7 +1,7 @@
 # Importa o APIRouter, que serve para agrupar todas essas rotas e depois plugar no main.py
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Form
 # Importação da lógica do négocio
-from functions.support.problems import listProblemsByTitle,get_problem, search_problems
+from functions.support.problems import listProblemsByTitle,get_problem, search_problems, create_problem
 
 from src.templates_config import templates
 
@@ -29,6 +29,14 @@ def search_problems_ui (request:Request, query: str = ""):
         context={"problemas":result["data"]}
     )
 
+@router.get("/ui/problems/new")
+def show_create_form(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="pages/create_problem.html",
+        context={"pagina_ativa": "problems"}
+    )
+
 @router.get("/ui/problems/{problem_id}")
 def getting_problems(request: Request, problem_id:int):
     result = get_problem(problem_id)
@@ -36,4 +44,18 @@ def getting_problems(request: Request, problem_id:int):
         request=request,
         name="partials/problem_detail.html",
         context={"problema":result}
+    )
+
+
+@router.post("/ui/problems/create")
+def create_problem_ui(
+    request:Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    solution: str = Form("")
+):
+    create_problem(title, description, solution, None, None)
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/problem_form.html"
     )
