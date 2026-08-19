@@ -3,6 +3,10 @@ from fastapi import APIRouter, Request, Form
 # Importação da lógica do négocio
 from functions.support.problems import listProblemsByTitle,get_problem, search_problems, create_problem
 
+from functions.support.problems_categories import create_category_problem
+
+from functions.support.categories import list_categories
+
 from src.templates_config import templates
 
 router = APIRouter()
@@ -40,10 +44,13 @@ def show_create_form(request: Request):
 @router.get("/ui/problems/{problem_id}")
 def getting_problems(request: Request, problem_id:int):
     result = get_problem(problem_id)
+    categorias_disponiveis = list_categories()
+
     return templates.TemplateResponse(
         request=request,
         name="partials/problem_detail.html",
-        context={"problema":result}
+        context={"problema":result,
+                 "categorias_disponiveis":categorias_disponiveis["data"]}
     )
 
 
@@ -59,3 +66,18 @@ def create_problem_ui(
         request=request,
         name="partials/problem_form.html"
     )
+
+@router.post("/ui/problems/{problem_id}/categories")
+def add_category_to_problem_ui(
+    request:Request,
+    problem_id:int,
+    category_id:int = Form(...)
+    ):
+    result = get_problem(problem_id)
+    categorias_disponiveis = list_categories()
+    create_category_problem(problem_id,category_id)
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/problem_detail.html",
+        context={"problema":result,
+                 "categorias_disponiveis":categorias_disponiveis["data"]})
