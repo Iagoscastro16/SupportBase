@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Form
 # Importação da lógica do négocio
 from functions.support.problems import listProblemsByTitle,get_problem, search_problems, create_problem
 
-from functions.support.problems_categories import create_category_problem
+from functions.support.problems_categories import create_category_problem,list_problems_categories,delete_category_problem
 
 from functions.support.categories import list_categories
 
@@ -45,12 +45,15 @@ def show_create_form(request: Request):
 def getting_problems(request: Request, problem_id:int):
     result = get_problem(problem_id)
     categorias_disponiveis = list_categories()
+    lista_vinculacao  = list_problems_categories(problem_id)
+
 
     return templates.TemplateResponse(
         request=request,
         name="partials/problem_detail.html",
         context={"problema":result,
-                 "categorias_disponiveis":categorias_disponiveis["data"]}
+                 "categorias_disponiveis":categorias_disponiveis["data"],
+                 "lista_vinculacao":lista_vinculacao["data"]}
     )
 
 
@@ -69,15 +72,34 @@ def create_problem_ui(
 
 @router.post("/ui/problems/{problem_id}/categories")
 def add_category_to_problem_ui(
-    request:Request,
-    problem_id:int,
-    category_id:int = Form(...)
-    ):
-    result = get_problem(problem_id)
+    request: Request,
+    problem_id: int,
+    category_id: int = Form(...)
+):
+    create_category_problem(problem_id, category_id)
+    result = get_problem(problem_id)                     
     categorias_disponiveis = list_categories()
-    create_category_problem(problem_id,category_id)
+    lista_vinculacao = list_problems_categories(problem_id)
+
     return templates.TemplateResponse(
         request=request,
         name="partials/problem_detail.html",
-        context={"problema":result,
-                 "categorias_disponiveis":categorias_disponiveis["data"]})
+        context={"problema": result,
+                 "categorias_disponiveis": categorias_disponiveis["data"],
+                 "lista_vinculacao": lista_vinculacao["data"]}
+    )
+
+@router.delete("/ui/problems/{problem_id}/categories/{category_id}")
+def remove_category_from_problem_ui(request: Request, problem_id: int, category_id: int):
+    delete_category_problem(problem_id, category_id)
+    result = get_problem(problem_id)
+    categorias_disponiveis = list_categories()
+    lista_vinculacao = list_problems_categories(problem_id)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/problem_detail.html",
+        context={"problema": result,
+                 "categorias_disponiveis": categorias_disponiveis["data"],
+                 "lista_vinculacao": lista_vinculacao["data"]}
+    )
