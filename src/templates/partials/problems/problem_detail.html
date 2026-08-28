@@ -1,9 +1,21 @@
-{% if problema['categorias'] %}
-<span class="text-xs text-gray-500">{{ problema['categorias'] }}</span>
+{% if lista_vinculacao %}
+<div class="flex flex-wrap gap-2 mb-2">
+    {% for categoria in lista_vinculacao %}
+    <span class="flex items-center gap-1 text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full">
+        {{ categoria['name'] }}
+        <button hx-delete="/ui/problems/{{ problema['id'] }}/categories/{{ categoria['id'] }}"
+                hx-target="#detalhe-problema"
+                hx-swap="innerHTML"
+                class="text-red-400 hover:text-red-300 ml-1">
+            ×
+        </button>
+    </span>
+    {% endfor %}
+</div>
 {% endif %}
 <h2 class="text-lg font-semibold text-white mt-1">{{ problema['title'] }}</h2>
 <p class="text-gray-300 mt-2">{{ problema['description'] }}</p>
-<form hx-post="/ui/problems/{{ problema['id'] }}/categories" hx-target="closest div" hx-swap="innerHTML"
+<form hx-post="/ui/problems/{{ problema['id'] }}/categories" hx-target="#detalhe-problema" hx-swap="innerHTML"
       class="mt-4 flex gap-2">
     <select name="category_id" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
         {% for categoria in categorias_disponiveis %}
