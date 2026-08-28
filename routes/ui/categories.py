@@ -11,7 +11,7 @@ def list_categories_with_problems(request: Request):
     result = list_categories()
     return templates.TemplateResponse(
         request=request,
-        name="pages/listing_categories.html",
+        name="pages/categories/listing_categories.html",
         context={"categorias":result["data"],"pagina_ativa":"categories"}
     )
 
@@ -19,7 +19,7 @@ def list_categories_with_problems(request: Request):
 def show_create_form_ui(request:Request):
     return templates.TemplateResponse(
         request=request,
-        name="pages/create_category.html",
+        name="pages/categories/create_category.html",
         context={"pagina_ativa": "categories"}
     )
 
@@ -29,7 +29,7 @@ def getting_category(request: Request, category_id: int):
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/get_category_id.html",
+        name="partials/categories/get_category_id.html",
         context={"categoria":result}
     )
 
@@ -42,5 +42,5 @@ def create_category_ui(
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/category_form.html"
+        name="partials/categories/category_form.html"
     )

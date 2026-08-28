@@ -18,7 +18,7 @@ def show_problems_list(request: Request):
     result = listProblemsByTitle()
     return templates.TemplateResponse(
         request=request,
-        name="pages/problem_list_by_title.html",
+        name="pages/problems/problem_list_by_title.html",
         context={"problemas": result["data"], "pagina_ativa":"problems"}
     )
 
@@ -29,7 +29,7 @@ def search_problems_ui (request:Request, query: str = ""):
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/search_problem.html",
+        name="partials/problems/search_problem.html",
         context={"problemas":result["data"]}
     )
 
@@ -37,7 +37,7 @@ def search_problems_ui (request:Request, query: str = ""):
 def show_create_form(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="pages/create_problem.html",
+        name="pages/problems/create_problem.html",
         context={"pagina_ativa": "problems"}
     )
 
@@ -48,7 +48,7 @@ def getting_problems(request: Request, problem_id:int):
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/problem_detail.html",
+        name="partials/problems/problem_detail.html",
         context={"problema":result,
                  "categorias_disponiveis":categorias_disponiveis["data"]}
     )
@@ -64,7 +64,7 @@ def create_problem_ui(
     create_problem(title, description, solution, None, None)
     return templates.TemplateResponse(
         request=request,
-        name="partials/problem_form.html"
+        name="partials/problems/problem_form.html"
     )
 
 @router.post("/ui/problems/{problem_id}/categories")
@@ -78,6 +78,6 @@ def add_category_to_problem_ui(
     create_category_problem(problem_id,category_id)
     return templates.TemplateResponse(
         request=request,
-        name="partials/problem_detail.html",
+        name="partials/problems/problem_detail.html",
         context={"problema":result,
                  "categorias_disponiveis":categorias_disponiveis["data"]})

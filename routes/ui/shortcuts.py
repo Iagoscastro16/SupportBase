@@ -11,7 +11,7 @@ def list_shortcut_by_position(request:Request):
     result = listshortcutByPosition()
     return templates.TemplateResponse(
         request=request,
-        name="pages/shortcut_by_position.html",
+        name="pages/shortcuts/shortcut_by_position.html",
         context={"atalhos":result["data"],"pagina_ativa":"shortcuts"}
     )
 
@@ -19,7 +19,7 @@ def list_shortcut_by_position(request:Request):
 def show_create_form_shortcut(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="pages/create_shortcut.html",
+        name="pages/shortcuts/create_shortcut.html",
         context={"pagina_ativa":"shortcuts"}
     )
 
@@ -28,7 +28,7 @@ def getting_shortcut(request: Request, shortcut_id: int):
     result = get_shortcut(shortcut_id)
     return templates.TemplateResponse(
         request=request,
-        name="partials/shortcut_detail.html",
+        name="partials/shortcuts/shortcut_detail.html",
         context={"atalho": result}
     )
 
@@ -41,5 +41,5 @@ def create_shortcut_ui(
     createshortcut(short_cut_key, phrase, position)
     return templates.TemplateResponse(
         request=request,
-        name="partials/shortcut_form.html"
+        name="partials/shortcuts/shortcut_form.html"
     )
