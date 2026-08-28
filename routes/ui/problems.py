@@ -80,13 +80,15 @@ def add_category_to_problem_ui(
     result = get_problem(problem_id)                     
     categorias_disponiveis = list_categories()
     lista_vinculacao = list_problems_categories(problem_id)
+    list_problems_by_title = listProblemsByTitle()
 
     return templates.TemplateResponse(
     request=request,
-    name="partials/problems/problem_detail.html",
+    name="partials/problems/detalhe_com_lista_oob.html",
     context={"problema": result,
             "categorias_disponiveis": categorias_disponiveis["data"],
-            "lista_vinculacao": lista_vinculacao["data"]}
+            "lista_vinculacao": lista_vinculacao["data"],
+            "problemas": list_problems_by_title["data"]}
         )
 
 @router.delete("/ui/problems/{problem_id}/categories/{category_id}")
@@ -95,11 +97,13 @@ def remove_category_from_problem_ui(request: Request, problem_id: int, category_
     result = get_problem(problem_id)
     categorias_disponiveis = list_categories()
     lista_vinculacao = list_problems_categories(problem_id)
+    list_problems_by_title = listProblemsByTitle()
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/problems/problem_detail.html",
+        name="partials/problems/detalhe_com_lista_oob.html",
         context={"problema": result,
                  "categorias_disponiveis": categorias_disponiveis["data"],
-                 "lista_vinculacao": lista_vinculacao["data"]}
+                 "lista_vinculacao": lista_vinculacao["data"],
+                 "problemas": list_problems_by_title["data"]}
     )
