@@ -23,38 +23,23 @@
                     +
                 </button>
 
-                <div x-show="showModal"
-                     x-cloak
+                <div x-show="showModal" x-cloak
                      class="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50">
-
                     <div @click.outside="showModal = false"
                          @keydown.escape.window="showModal = false"
                          @htmx:after-request="if ($event.detail.successful) showModal = false"
                          id="form-criar-problema"
                          class="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4">
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <div id="lista-problemas">
-            <ul class="space-y-3">
-                {% for problema in problemas %}
-                <li hx-get="/ui/problems/{{ problema['id'] }}" hx-target="#detalhe-problema" hx-swap="innerHTML"
-                    class="bg-gray-900 border border-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-800 transition-colors">
-
-                    {% if problema['categorias'] %}
-                    <span class="text-xs text-gray-500">{{ problema['categorias'] }}</span>
-                    {% endif %}
-
-                    <p class="text-white font-medium mt-1">{{ problema['title'] }}</p>
-                </li>
-                {% endfor %}
-            </ul>
+        <div x-data="{ aberto: null }">
+            <div id="lista-problemas">
+                {% include "partials/problems/search_problem.html" %}
+            </div>
         </div>
 
-        <div id="detalhe-problema" class="mt-6 p-4 bg-gray-900 border border-gray-800 rounded-lg min-h-[80px]">
-        </div>
     </div>
 {% endblock %}

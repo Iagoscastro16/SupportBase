@@ -80,19 +80,20 @@ def add_category_to_problem_ui(
     category_id: int = Form(...)
 ):
     create_category_problem(problem_id, category_id)
-    result = get_problem(problem_id)                     
+    result = get_problem(problem_id)
     categorias_disponiveis = list_categories()
     lista_vinculacao = list_problems_categories(problem_id)
-    list_problems_by_title = listProblemsByTitle()
+    categorias_texto = ", ".join([c["name"] for c in lista_vinculacao["data"]])
 
     return templates.TemplateResponse(
-    request=request,
-    name="partials/problems/detalhe_com_lista_oob.html",
-    context={"problema": result,
-            "categorias_disponiveis": categorias_disponiveis["data"],
-            "lista_vinculacao": lista_vinculacao["data"],
-            "problemas": list_problems_by_title["data"]}
-        )
+        request=request,
+        name="partials/problems/detalhe_com_badge_oob.html",
+        context={"problema": result,
+                 "categorias_disponiveis": categorias_disponiveis["data"],
+                 "lista_vinculacao": lista_vinculacao["data"],
+                 "problema_id": problem_id,
+                 "categorias": categorias_texto}
+    )
 
 @router.delete("/ui/problems/{problem_id}/categories/{category_id}")
 def remove_category_from_problem_ui(request: Request, problem_id: int, category_id: int):
@@ -100,15 +101,16 @@ def remove_category_from_problem_ui(request: Request, problem_id: int, category_
     result = get_problem(problem_id)
     categorias_disponiveis = list_categories()
     lista_vinculacao = list_problems_categories(problem_id)
-    list_problems_by_title = listProblemsByTitle()
+    categorias_texto = ", ".join([c["name"] for c in lista_vinculacao["data"]])
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/problems/detalhe_com_lista_oob.html",
+        name="partials/problems/detalhe_com_badge_oob.html",
         context={"problema": result,
                  "categorias_disponiveis": categorias_disponiveis["data"],
                  "lista_vinculacao": lista_vinculacao["data"],
-                 "problemas": list_problems_by_title["data"]}
+                 "problema_id": problem_id,
+                 "categorias": categorias_texto}
     )
 
 @router.get("/ui/problems/new/form")
