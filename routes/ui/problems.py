@@ -65,9 +65,12 @@ def create_problem_ui(
     solution: str = Form("")
 ):
     create_problem(title, description, solution, None, None)
+    list_problems_by_title = listProblemsByTitle()
+
     return templates.TemplateResponse(
         request=request,
-        name="partials/problems/problem_form.html"
+        name="partials/problems/form_com_lista_oob.html",
+        context={"problemas": list_problems_by_title["data"]}
     )
 
 @router.post("/ui/problems/{problem_id}/categories")
@@ -106,4 +109,11 @@ def remove_category_from_problem_ui(request: Request, problem_id: int, category_
                  "categorias_disponiveis": categorias_disponiveis["data"],
                  "lista_vinculacao": lista_vinculacao["data"],
                  "problemas": list_problems_by_title["data"]}
+    )
+
+@router.get("/ui/problems/new/form")
+def show_create_form_partial(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/problems/problem_form.html"
     )
