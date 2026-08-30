@@ -87,7 +87,7 @@ def add_category_to_problem_ui(
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/problems/detalhe_com_badge_oob.html",
+        name="partials/problems/detalhe_com_lista_oob.html",
         context={"problema": result,
                  "categorias_disponiveis": categorias_disponiveis["data"],
                  "lista_vinculacao": lista_vinculacao["data"],
@@ -105,7 +105,7 @@ def remove_category_from_problem_ui(request: Request, problem_id: int, category_
 
     return templates.TemplateResponse(
         request=request,
-        name="partials/problems/detalhe_com_badge_oob.html",
+        name="partials/problems/detalhe_com_lista_oob.html",
         context={"problema": result,
                  "categorias_disponiveis": categorias_disponiveis["data"],
                  "lista_vinculacao": lista_vinculacao["data"],
