@@ -13,6 +13,7 @@ __pycache__/
 
 # Só pra garantir
 .env
+.env.test
 
 # ignora a maquina virtual
 .venv/
