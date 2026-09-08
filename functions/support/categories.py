@@ -98,30 +98,16 @@ def delete_category(id):
         with conn.cursor() as cursor:
             
             cursor.execute('''
-            SELECT p.id
-            FROM problems_categories pc
-            INNER JOIN problems p
-                ON pc.problem_id = p.id
-            WHERE pc.category_id = %s
-            AND p.ativo = TRUE;
-                        ''',(id,)
-            )
-
-            result = cursor.fetchone()
-
-            if result is not None:
-                return {"success": False,
-                        "errorMessage": "Existe um problema ativo vinculado"}
-
-            cursor.execute('''
             UPDATE categories 
             SET ativo = FALSE
             where id = %s
-            ''',(id,)
+                        ''',(id,)
             )
+                        
             conn.commit()
-            
+
             return cursor.rowcount
+        
     except Exception as error:
         print(error)
         conn.rollback()

@@ -28,23 +28,9 @@ def create_problem(title,description,solution,image_problem,image_solution):
 def listProblemsByTitle(incluir_inativos=False):
 
     if incluir_inativos:
-        query = '''SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
-        FROM problems p
-        LEFT JOIN problems_categories pc ON pc.problem_id = p.id
-        LEFT JOIN categories c ON c.id = pc.category_id
-        GROUP BY p.id, p.title, p.ativo
-        ORDER BY p.title ASC'''
-        
+        query = "SELECT id, title, ativo FROM problems order by title ASC"
     else:
-
-        query = '''SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
-        FROM problems p
-        LEFT JOIN problems_categories pc ON pc.problem_id = p.id
-        LEFT JOIN categories c ON c.id = pc.category_id
-        WHERE p.ativo = True
-        GROUP BY p.id, p.title, p.ativo
-        ORDER BY p.title ASC'''
-
+        query = "SELECT id, title, ativo FROM problems WHERE ativo = True order by title ASC"
     try:
         with conn.cursor() as cursor:
     
@@ -104,21 +90,17 @@ def get_problem(id):
     try:
         with conn.cursor() as cursor:
             cursor.execute('''
-            SELECT p.id, p.created_at, p.title, p.description, p.solution,
-                   p.image_problem, p.image_solution, p.ativo,
-                   STRING_AGG(c.name, ', ') AS categorias
-            FROM problems p
-            LEFT JOIN problems_categories pc ON pc.problem_id = p.id
-            LEFT JOIN categories c ON c.id = pc.category_id
-            WHERE p.id = %s
-            GROUP BY p.id, p.created_at, p.title, p.description, p.solution,
-                     p.image_problem, p.image_solution, p.ativo
-            ''', (id,))
+            SELECT id,created_at,title,description,solution,image_problem,image_solution, ativo from problems where id = %s
+                        ''',(id,)
+                        )
+
             return cursor.fetchone()
+
     except Exception as error:
         print(error)
         conn.rollback()
-        return {"success": False, "errorMessage": "Erro ao listar problemas"}
+        return {"success": False,
+                "errorMessage":"Erro ao listar problemas"}
 
 # Edição completa dos problemas 
 
@@ -146,28 +128,6 @@ def edit_problems(id,title,description,solution,image_problem,image_solution):
         return {"success": False,
                 "errorMessage": "Erro ao editar problema"}
 
-
-def search_problems(query):
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute('''
-            SELECT p.id, p.title, p.ativo, STRING_AGG(c.name, ', ') AS categorias
-            FROM problems p
-            LEFT JOIN problems_categories pc ON pc.problem_id = p.id
-            LEFT JOIN categories c ON c.id = pc.category_id
-            WHERE p.ativo = True AND (p.title ILIKE %s OR p.description ILIKE %s)
-            GROUP BY p.id, p.title, p.ativo
-            ORDER BY p.title ASC
-            ''', (f"%{query}%", f"%{query}%"))
-
-            data = cursor.fetchall()
-
-            return {"success": True, "data": data}
-        
-    except Exception as error:
-        print(error)
-        conn.rollback()
-        return {"success": False, "errorMessage": "Erro ao buscar problemas"}
     
 def delete_problems(id):
     try:
