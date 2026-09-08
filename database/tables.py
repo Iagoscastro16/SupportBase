@@ -54,4 +54,27 @@ def createTables():
                                     )'''
     )
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS empresa (
+        id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        razao_social VARCHAR(150) NOT NULL,
+        nome_fantasia VARCHAR(60),
+        cnpj VARCHAR(14) NOT NULL UNIQUE,
+        ativo BOOLEAN NOT NULL DEFAULT TRUE
+                )'''
+    )
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuario (
+        id SERIAL PRIMARY KEY,
+        nome VARCHAR(150) NOT NULL,
+        email VARCHAR(256) NOT NULL UNIQUE,
+        senha TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ativo BOOLEAN NOT NULL DEFAULT TRUE,
+        empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT
+            )'''
+    )
+
     conn.commit()
