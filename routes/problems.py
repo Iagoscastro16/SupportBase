@@ -47,7 +47,7 @@ def getting_problems(problem_id: int,):
 
     return result
 
-@router.get("/problems")
+@router.get("/problems/{id}")
 def list_problem_by_title(incluir_inativo: bool = False):
     result = listProblemsByTitle(incluir_inativo)
 
