@@ -48,9 +48,12 @@ def createTables():
         CREATE TABLE IF NOT EXISTS shortcuts( 
             id SERIAL PRIMARY KEY,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            short_cut_key VARCHAR(40) NOT NULL UNIQUE,
+            short_cut_key VARCHAR(40) NOT NULL,
             phrase VARCHAR(255) NOT NULL,
-            position INTEGER UNIQUE CHECK (position >= 1 and position <= 9)
+            position INTEGER CHECK (position >= 1 and position <= 9),
+            empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
+            UNIQUE (short_cut_key,empresa_id),
+            UNIQUE (position, empresa_id)
                                     )'''
     )
 

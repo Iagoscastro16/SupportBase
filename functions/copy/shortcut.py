@@ -2,7 +2,7 @@
 from config import conn
 
 # ValidatePosition verifica se o número é inteiro com o isinstance, tanto se é número inteiro quanto se está entre 1 e 9, depois dá select em um dos atalhos e verifica se aquele atalho está disponivel
-def validatePosition(position):
+def validatePosition(position,empresa_id):
     # Primeira barreira: garante que position é um inteiro. O isinstance evita erros silenciosos com strings como "5"
     if not isinstance(position, int):
         return {
@@ -22,8 +22,8 @@ def validatePosition(position):
         cursor = conn.cursor()
 
         # Consulta enxuta: só precisa do id para saber se a posição já existe, não precisa trazer colunas desnecessárias
-        query_verification = "SELECT id FROM shortcuts WHERE position = %s LIMIT 1"
-        cursor.execute(query_verification, (position,))
+        query_verification = "SELECT id FROM shortcuts WHERE empresa_id = %s and position = %s LIMIT 1"
+        cursor.execute(query_verification, (empresa_id,position))
 
         result = cursor.fetchone()
 
@@ -51,14 +51,14 @@ def validatePosition(position):
             cursor.close()
 
 #2. criando a função de atribuir tecla a frase
-def createshortcut(short_cut_key,phrase,position):
+def createshortcut(short_cut_key,phrase,position,empresa_id):
     if not short_cut_key or not phrase:
         return {"success": False,
                     "errorMessage": "atalho ou frase não podem ser vazios"}
     #anotação pq foi dificil fazer, aqui eu estou aproveitando o que veio da função validatePosition, ele já verifica o número do position e no dicionario eu já chamo o erro
     # Reprova cedo: se a posição for inválida, nem chega a abrir conexão para o INSERT
     if position is not None:
-        result = validatePosition(position)
+        result = validatePosition(position,empresa_id)
 
         # Se validatePosition retornou success False, repassa o erro direto para quem chamou
         if not result["success"]:
@@ -75,8 +75,8 @@ def createshortcut(short_cut_key,phrase,position):
         # INSERT simples passando os 3 campos. Como position pode ser None, vai gravar NULL na coluna (se ela permitir)
         cursor.execute('''
                     
-        INSERT INTO shortcuts (short_cut_key,phrase,position) VALUES (%s,%s,%s) 
-        ''', (short_cut_key,phrase,position))
+        INSERT INTO shortcuts (short_cut_key,phrase,position,empresa_id) VALUES (%s,%s,%s,%s)
+        ''', (short_cut_key,phrase,position,empresa_id))
         
         # commit obrigatório aqui porque o INSERT só é efetivado de fato após o commit
         conn.commit()
@@ -95,19 +95,19 @@ def createshortcut(short_cut_key,phrase,position):
 
     
 #3.  criando a função de listar as frases e teclas
-def listshortcutByPosition():
+def listshortcutByPosition(empresa_id):
     # Não recebe parâmetros — sempre retorna todos os atalhos ordenados por posição
     
     cursor = None
     try:
         cursor = conn.cursor()
         
-        # NULLS LAST é o detalhe legal aqui: joga os atalhos sem posição para o final da lista,
+        # NULLS LAST joga os atalhos sem posição para o final da lista,
         # mantendo os que têm posição numerada aparecendo primeiro (mais organizado para o usuário)
         cursor.execute('''
         SELECT id, short_cut_key, phrase, position
-        FROM shortcuts ORDER BY position ASC NULLS LAST
-                    ''')
+        FROM shortcuts WHERE empresa_id = %s ORDER BY position ASC NULLS LAST
+                    ''',(empresa_id,))
         
         data = cursor.fetchall()
         return {"success": True,
@@ -123,7 +123,7 @@ def listshortcutByPosition():
 
 
 
-def listShortcutByDate(ordem_escolhida):
+def listShortcutByDate(ordem_escolhida,empresa_id):
     # Essa função permite listar ordenando por data — mais antiga primeiro ou mais recente primeiro
     
     # Mapeia a escolha do usuário para o trecho SQL correspondente
@@ -139,12 +139,12 @@ def listShortcutByDate(ordem_escolhida):
                 "errorMessage": "Ordem inválida"
                 }
     
-    query = f"SELECT id, created_at,short_cut_key ,phrase, position FROM shortcuts ORDER BY {ordem}"
+    query = f"SELECT id, created_at,short_cut_key ,phrase, position FROM shortcuts WHERE empresa_id = %s ORDER BY {ordem}"
     cursor = None
     try:
         cursor = conn.cursor()
     
-        cursor.execute(query)
+        cursor.execute(query,(empresa_id,))
 
         data = cursor.fetchall()
         return {"success": True,
@@ -160,7 +160,7 @@ def listShortcutByDate(ordem_escolhida):
 
 
 
-def EditShortcut(id,short_cut_key,phrase, position):
+def EditShortcut(id,short_cut_key,phrase, position, empresa_id):
     # Função orquestradora do fluxo de edição: busca o atalho, valida a posição, atualiza e commita
     # Padrão diferente do createshortcut: aqui o cursor é criado uma vez e repassado para as funções auxiliares,
     # evitando abrir e fechar cursor várias vezes dentro da mesma operação
@@ -170,20 +170,20 @@ def EditShortcut(id,short_cut_key,phrase, position):
     try:
         cursor = conn.cursor()
         # Primeiro verifica se o atalho existe — não faz sentido editar algo que não está lá
-        shortcut = getShortcutById(cursor,id)
+        shortcut = getShortcutById(cursor,id,empresa_id)
         
         if shortcut == None:
             return {"success": False,
                     "errorMessage": "Não existe um atalho para editar"
                     }
         # Validação específica para edição: permite manter a posição atual (id != %s na query interna)
-        positionToEdit = validateEditPosition(cursor,id,position)
+        positionToEdit = validateEditPosition(cursor,id,position,empresa_id)
         
         if not positionToEdit["success"]:
             return positionToEdit
             
         # Se passou nas validações, tenta atualizar. updateShortcut retorna rowcount
-        updateValue = updateShortcut(cursor, id,short_cut_key, phrase, position)
+        updateValue = updateShortcut(cursor, id,short_cut_key, phrase, position, empresa_id)
         if updateValue == 0:
             # rowcount 0 = nenhuma linha afetada, geralmente id inexistente (já checado acima, mas é uma proteção extra)
             return {"success": False,
@@ -210,13 +210,13 @@ def EditShortcut(id,short_cut_key,phrase, position):
     
     
     
-def getShortcutById(cursor, shortcut_id):
+def getShortcutById(cursor, shortcut_id, empresa_id):
     # Função auxiliar que reaproveita o cursor aberto pela função chamadora (não fecha aqui dentro)
     # Retorna a linha completa do atalho — útil tanto para validar existência quanto para leitura de campos
         
     cursor.execute('''
-         SELECT id, created_at,short_cut_key,phrase,position FROM shortcuts WHERE id = %s
-                    ''',(shortcut_id,))
+         SELECT id, created_at,short_cut_key,phrase,position FROM shortcuts WHERE id = %s and empresa_id = %s
+                    ''',(shortcut_id,empresa_id))
         
     shortcut = cursor.fetchone()
     
@@ -224,7 +224,7 @@ def getShortcutById(cursor, shortcut_id):
 
 
 
-def validateEditPosition(cursor, id, position):
+def validateEditPosition(cursor, id, position, empresa_id):
     # Versão "edit" da validatePosition: recebe o cursor por parâmetro e exclui o próprio id da busca.
     # Isso permite que o usuário mantenha a mesma posição do atalho que está editando sem disparar "posição ocupada".
     
@@ -248,8 +248,8 @@ def validateEditPosition(cursor, id, position):
         
     # Ponto chave da diferença: "id != %s" garante que a posição só é considerada ocupada se pertencer a OUTRO atalho
     cursor.execute('''
-        SELECT id FROM shortcuts WHERE POSITION = %s and id != %s
-                   ''',(position,id))
+        SELECT id FROM shortcuts WHERE POSITION = %s and id != %s and empresa_id = %s
+                   ''',(position,id,empresa_id))
     
     
     result = cursor.fetchone()
@@ -263,7 +263,7 @@ def validateEditPosition(cursor, id, position):
     
 
     
-def updateShortcut(cursor, id,short_cut_key, phrase, position):
+def updateShortcut(cursor, id,short_cut_key, phrase, position,empresa_id):
     # UPDATE parcial usando COALESCE: se algum campo vier None, mantém o valor que já estava no banco.
     # Isso permite editar só alguns campos sem precisar passar todos — bem prático para formulários parciais.
     
@@ -273,18 +273,18 @@ def updateShortcut(cursor, id,short_cut_key, phrase, position):
         short_cut_key = COALESCE(%s, short_cut_key),
         phrase = COALESCE(%s, phrase),
         position = COALESCE(%s,position)
-        WHERE id = %s
-                   ''',(short_cut_key,phrase,position,id))
+        WHERE id = %s and empresa_id = %s
+                   ''',(short_cut_key,phrase,position,id,empresa_id))
     
     # rowcount informa quantas linhas foram afetadas pelo UPDATE — 0 significa que o id não foi encontrado
     return cursor.rowcount
 
-def get_shortcut(id):
+def get_shortcut(id,empresa_id):
     try:
         with conn.cursor() as cursor:
             cursor.execute('''
-            SELECT id, created_at, short_cut_key, phrase, position FROM shortcuts WHERE id = %s
-            ''', (id,))
+            SELECT id, created_at, short_cut_key, phrase, position FROM shortcuts WHERE id = %s and empresa_id = %s
+            ''', (id,empresa_id))
             return cursor.fetchone()
     except Exception as error:
         print(error)
@@ -294,7 +294,7 @@ def get_shortcut(id):
     
     
 #7. apagando as atribuições                   
-def deleteshortcut(id):
+def deleteshortcut(id,empresa_id):
     # Deleta o atalho pelo id. Usa rowcount para distinguir entre "deletou" e "não achou nada para deletar"
     
     cursor = None
@@ -303,8 +303,8 @@ def deleteshortcut(id):
         
         cursor.execute('''
         DELETE FROM shortcuts
-        WHERE id = %s
-        ''', (id,)            
+        WHERE id = %s and empresa_id = %s
+        ''', (id,empresa_id)            
            
                            )
         # Se nenhuma linha foi afetada, é porque o id não existia — evita dar "sucesso" em uma exclusão fantasma
