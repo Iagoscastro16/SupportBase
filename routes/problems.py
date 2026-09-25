@@ -17,6 +17,7 @@ class Body_problem(BaseModel):
     solution: Optional[str] = None
     image_problem: Optional[str] = None
     image_solution: Optional[str] = None
+    empresa_id: int
 
 # O editproblems necessita de todos os campos serem opcionais, pois nem sempre o usuario vai mudar tudo obviamente
 
@@ -26,30 +27,31 @@ class Body_edit_problem(BaseModel):
     solution : Optional[str] = None
     image_problem: Optional[str] = None
     image_solution: Optional[str] = None
+    empresa_id: int
 
 # Rota criação problems
 
 @router.post("/problems")
 def creationProblems(body: Body_problem):
-    result = create_problem(body.title,body.description, body.solution, body.image_problem, body.image_solution)
+    result = create_problem(body.title,body.description, body.solution, body.image_problem, body.image_solution,body.empresa_id)
 
     return result
 
 @router.get("/problems/by-date")
-def list_problem_by_date(ordemEscolhida: str, incluir_inativo: bool = False):
-    result = listProblemsByDate(ordemEscolhida, incluir_inativo)
+def list_problem_by_date( empresa_id : int,ordemEscolhida: str, incluir_inativo: bool = False):
+    result = listProblemsByDate(empresa_id,ordemEscolhida, incluir_inativo)
 
     return result
 
 @router.get("/problems/{problem_id}")
-def getting_problems(problem_id: int,):
-    result = get_problem(problem_id)
+def getting_problems(problem_id: int, empresa_id : int):
+    result = get_problem(problem_id, empresa_id)
 
     return result
 
-@router.get("/problems/{id}")
-def list_problem_by_title(incluir_inativo: bool = False):
-    result = listProblemsByTitle(incluir_inativo)
+@router.get("/problems")
+def list_problem_by_title(empresa_id: int, incluir_inativo: bool = False):
+    result = listProblemsByTitle(empresa_id,incluir_inativo)
 
     return result
 
@@ -57,12 +59,12 @@ def list_problem_by_title(incluir_inativo: bool = False):
 
 @router.patch("/problems/{problem_id}")
 def edit_problem(problem_id: int, body: Body_edit_problem):
-    result = edit_problems(problem_id, body.title, body.description, body.solution, body.image_problem, body.image_solution)
+    result = edit_problems(problem_id, body.title, body.description, body.solution, body.image_problem, body.image_solution,body.empresa_id)
 
     return result
 
 @router.delete("/problems/{problem_id}")
-def delete_problem(problem_id: int):
-    result = delete_problems(problem_id)
+def delete_problem(problem_id: int, empresa_id: int):
+    result = delete_problems(problem_id, empresa_id)
 
     return result
