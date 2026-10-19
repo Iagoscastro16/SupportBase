@@ -41,6 +41,9 @@ def validatePosition(position,empresa_id,usuario_id):
     except Exception as error:
         # Loga o erro no console para debug, mas retorna mensagem amigável para o usuário
         print(error)
+        # Rollback aqui também: sem ele a conn (compartilhada entre requisições) fica travada
+        # em "transação abortada" e toda query seguinte nessa conexão falha
+        conn.rollback()
         return {
             "success": False,
             "errorMessage": "Erro ao validar posição"
@@ -115,6 +118,8 @@ def listshortcutByPosition(empresa_id,usuario_id):
                 "data": data}
     except Exception as error:
         print(error)
+        # Mesma razão do rollback em validatePosition: evita deixar a conn travada pra próxima requisição
+        conn.rollback()
         return {"success": False,
                 "errorMessage": "Erro ao listar atalhos"
                 }
@@ -152,6 +157,8 @@ def listShortcutByDate(ordem_escolhida,empresa_id,usuario_id):
                 "data": data}
     except Exception as error:
         print(error)
+        # Mesma razão do rollback em validatePosition: evita deixar a conn travada pra próxima requisição
+        conn.rollback()
         return {"success": False,
                 "errorMessage": "Erro ao listar atalhos"
                 }
