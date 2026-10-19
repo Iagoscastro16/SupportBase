@@ -20,3 +20,5 @@ __pycache__/
 a
 #ignora o htmx
 src/static/htmx.min.js
+
+claude.md

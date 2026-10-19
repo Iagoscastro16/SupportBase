@@ -2,18 +2,20 @@ from fastapi import APIRouter
 from functions.support.categories import create_category, edit_categories, list_categories, delete_category
 from pydantic import BaseModel
 
-router = APIRouter()
+router = APIRouter(tags=["Categories"])
 
 #Base Model utilizando o pydantic, essa classe serve para tratar e validar os dados de forma mais simplificada
 
 class BodyName(BaseModel):
     name: str
+    empresa_id: int
 
 # Rota de listar as categorias
 
 @router.get("/categories")
-def listOfcategories(incluir_inativo: bool = False):
-    result = list_categories(incluir_inativo)
+def listOfcategories(empresa_id: int, incluir_inativo: bool = False):
+    # Assinatura do service: list_categories(empresa_id, incluir_inativo)
+    result = list_categories(empresa_id, incluir_inativo)
 
     return result
 
@@ -21,7 +23,8 @@ def listOfcategories(incluir_inativo: bool = False):
 
 @router.post("/categories")
 def creationCategory(body: BodyName):
-    result = create_category(body.name)
+    # Assinatura do service: create_category(name, empresa_id)
+    result = create_category(body.name, body.empresa_id)
 
     return result
 
@@ -29,14 +32,16 @@ def creationCategory(body: BodyName):
 
 @router.patch("/categories/{category_id}")
 def editingCategories(category_id: int, body: BodyName):
-    result = edit_categories(category_id, body.name)
+    # Assinatura do service: edit_categories(id, name, empresa_id)
+    result = edit_categories(category_id, body.name, body.empresa_id)
 
     return result
 
 # Rota de deletar a categgoria
 
 @router.delete("/categories/{category_id}")
-def deletingCategories(category_id: int):
-    result = delete_category(category_id)
+def deletingCategories(category_id: int, empresa_id: int):
+    # Assinatura do service: delete_category(id, empresa_id)
+    result = delete_category(category_id, empresa_id)
 
     return result

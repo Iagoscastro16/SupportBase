@@ -7,7 +7,7 @@ from typing import Optional
 #  BaseModel do Pydantic é a ferramenta do FastAPI para validar o corpo da requisição (JSON)
 from pydantic import BaseModel
 
-router = APIRouter()
+router = APIRouter(tags=["Problems"])
 
 # Base Model do problems, aqui me utilizei do optional para não obrigar a requisição a mandar solution, image problem e description
 
@@ -39,7 +39,8 @@ def creationProblems(body: Body_problem):
 
 @router.get("/problems/by-date")
 def list_problem_by_date( empresa_id : int,ordemEscolhida: str, incluir_inativo: bool = False):
-    result = listProblemsByDate(empresa_id,ordemEscolhida, incluir_inativo)
+    # Ordem segue a assinatura do service: (ordemEscolhida, empresa_id, incluir_inativo)
+    result = listProblemsByDate(ordemEscolhida, empresa_id, incluir_inativo)
 
     return result
 
