@@ -47,16 +47,24 @@ def createTables():
                 )
 
     #4. criação da tabela de categorias, apenas o nome, existe uma tabela que liga a categoria com o problema, pois a relação direta entre as duas é (n:n)
-    # name não é mais UNIQUE sozinho: duas empresas podem ter uma categoria com o mesmo nome, só não a mesma empresa duas vezes
+    # name não é UNIQUE sozinho: duas empresas podem ter uma categoria com o mesmo nome, só não a mesma empresa duas vezes
+    # o CHECK impede nome vazio (ou só espaços) direto no banco, último nível de defesa depois do Pydantic e do service
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS categories(
             id SERIAL PRIMARY KEY,
             name VARCHAR(80) NOT NULL,
             ativo BOOLEAN NOT NULL DEFAULT TRUE,
             empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
-            UNIQUE (name, empresa_id)
+            CONSTRAINT categories_name_not_blank CHECK (btrim(name) <> '')
                                 )'''
                 )
+
+    # a unicidade ignora caixa e espaços nas pontas: "Rede", "rede" e " rede " são o mesmo nome na mesma empresa
+    # UNIQUE inline não aceita expressão, por isso é um índice único separado
+    cursor.execute('''
+        CREATE UNIQUE INDEX IF NOT EXISTS categories_name_empresa_uniq
+        ON categories (lower(btrim(name)), empresa_id)
+                    ''')
 
     #5. criação da tabela que liga o problema com a categoria(primeiro cria o campo, depois a chave estrangeira, no final uma chave primaria composta)
     cursor.execute('''  

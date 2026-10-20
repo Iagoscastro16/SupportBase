@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from functions.support.categories import create_category, edit_categories, list_categories, delete_category
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 router = APIRouter(tags=["Categories"])
 
@@ -9,6 +9,15 @@ router = APIRouter(tags=["Categories"])
 class BodyName(BaseModel):
     name: str
     empresa_id: int
+
+    # primeira camada da regra de nome: tira espaços das pontas e rejeita vazio (a rota devolve 422)
+    @field_validator("name")
+    @classmethod
+    def limpar_nome(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("O nome da categoria não pode ser vazio")
+        return value
 
 # Rota de listar as categorias
 

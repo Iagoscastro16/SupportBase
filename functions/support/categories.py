@@ -4,6 +4,12 @@ from config import conn
 # no mais, é um CRUD básico
 
 def create_category(name,empresa_id):
+    # segunda camada: o service não confia que quem o chama já limpou o nome (ex.: testes ou outro service)
+    name = name.strip()
+    if not name:
+        return {"success": False,
+                "errorMessage": "O nome da categoria não pode ser vazio"}
+
     try:
         with conn.cursor() as cursor:
         
@@ -25,7 +31,12 @@ def create_category(name,empresa_id):
 
 
 def edit_categories(id,name,empresa_id):
-    
+    # mesma regra do create_category
+    name = name.strip()
+    if not name:
+        return {"success": False,
+                "errorMessage": "O nome da categoria não pode ser vazio"}
+
     try:
         with conn.cursor() as cursor:
     
