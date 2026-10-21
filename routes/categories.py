@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from functions.support.categories import create_category, edit_categories, list_categories, delete_category
+from functions.support.categories import create_category, edit_categories, list_categories, delete_category, reactivate_category
 from pydantic import BaseModel, field_validator
 
 router = APIRouter(tags=["Categories"])
@@ -52,5 +52,14 @@ def editingCategories(category_id: int, body: BodyName):
 def deletingCategories(category_id: int, empresa_id: int):
     # Assinatura do service: delete_category(id, empresa_id)
     result = delete_category(category_id, empresa_id)
+
+    return result
+
+# Rota de reativar a categoria (inverso do delete, que só inativa)
+
+@router.patch("/categories/{category_id}/reactivate")
+def reactivatingCategories(category_id: int, empresa_id: int):
+    # Assinatura do service: reactivate_category(id, empresa_id)
+    result = reactivate_category(category_id, empresa_id)
 
     return result

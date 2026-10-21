@@ -124,3 +124,32 @@ def delete_category(id,empresa_id):
         return {"success": False,
                 "errorMessage": "Não foi possível inativar a categoria"}
     
+
+
+# inverso do soft delete: volta a categoria para ativa
+# o UNIQUE de nome não olha `ativo`, então a categoria inativada continua ocupando o nome: reativar é o caminho, não criar de novo
+def reactivate_category(id,empresa_id):
+    try:
+        with conn.cursor() as cursor:
+
+            cursor.execute('''
+            UPDATE categories
+            SET ativo = TRUE
+            WHERE id = %s AND empresa_id = %s
+                        ''',(id,empresa_id)
+            )
+
+            conn.commit()
+
+            # rowcount 0 = não existe, ou pertence a outra empresa
+            if cursor.rowcount == 0:
+                return {"success": False,
+                        "errorMessage": "Categoria não encontrada"}
+
+            return {"success": True}
+
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Não foi possível reativar a categoria"}
