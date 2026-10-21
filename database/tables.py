@@ -27,7 +27,8 @@ def createTables():
         senha TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         ativo BOOLEAN NOT NULL DEFAULT TRUE,
-        empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT
+        empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
+        CONSTRAINT usuario_id_empresa_uniq UNIQUE (id, empresa_id)
             )'''
     )
 
@@ -42,7 +43,8 @@ def createTables():
             image_problem VARCHAR(255),
             image_solution VARCHAR(255),
             ativo BOOLEAN NOT NULL DEFAULT TRUE,
-            empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT
+            empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
+            CONSTRAINT problems_id_empresa_uniq UNIQUE (id, empresa_id)
                             )'''
                 )
 
@@ -55,7 +57,8 @@ def createTables():
             name VARCHAR(80) NOT NULL,
             ativo BOOLEAN NOT NULL DEFAULT TRUE,
             empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
-            CONSTRAINT categories_name_not_blank CHECK (btrim(name) <> '')
+            CONSTRAINT categories_name_not_blank CHECK (btrim(name) <> ''),
+            CONSTRAINT categories_id_empresa_uniq UNIQUE (id, empresa_id)
                                 )'''
                 )
 
@@ -67,12 +70,18 @@ def createTables():
                     ''')
 
     #5. criação da tabela que liga o problema com a categoria(primeiro cria o campo, depois a chave estrangeira, no final uma chave primaria composta)
+    # as FKs são compostas com empresa_id: o banco recusa vincular um problema de uma empresa a uma categoria de outra
+    # por isso problems e categories têm UNIQUE (id, empresa_id), que é o alvo dessas FKs (o id já é único, o par só serve de referência)
     cursor.execute('''  
         CREATE TABLE IF NOT EXISTS problems_categories(
-            problem_id INTEGER NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
-            category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+            problem_id INTEGER NOT NULL,
+            category_id INTEGER NOT NULL,
             empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
-            PRIMARY KEY (problem_id, category_id)
+            PRIMARY KEY (problem_id, category_id),
+            CONSTRAINT problems_categories_problem_empresa_fkey FOREIGN KEY (problem_id, empresa_id)
+                REFERENCES problems(id, empresa_id) ON DELETE CASCADE,
+            CONSTRAINT problems_categories_category_empresa_fkey FOREIGN KEY (category_id, empresa_id)
+                REFERENCES categories(id, empresa_id) ON DELETE CASCADE
                                         )'''
                 )
     #6. criação da tabela de configurações, com chave e valor. Settings é por empresa, por isso a PK é composta
@@ -93,7 +102,9 @@ def createTables():
             phrase VARCHAR(255) NOT NULL,
             position INTEGER CHECK (position >= 1 and position <= 9),
             empresa_id INTEGER NOT NULL REFERENCES empresa(id) ON DELETE RESTRICT,
-            usuario_id INTEGER NOT NULL REFERENCES usuario(id) ON DELETE RESTRICT,
+            usuario_id INTEGER NOT NULL,
+            CONSTRAINT shortcuts_usuario_empresa_fkey FOREIGN KEY (usuario_id, empresa_id)
+                REFERENCES usuario(id, empresa_id) ON DELETE RESTRICT,
             UNIQUE (short_cut_key, usuario_id),
             UNIQUE (position, usuario_id)
                                     )'''
