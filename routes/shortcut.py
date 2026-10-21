@@ -12,12 +12,12 @@ from pydantic import BaseModel
 
 router = APIRouter(tags=["Shortcuts"])
 
-# Modelo para criar: A chave do atalho é obrigatória, mas a frase e a posição são opcionais
+# Modelo para criar: a chave e a frase são obrigatórias (o service e o banco, NOT NULL, já exigem as duas), só a posição é opcional
 class body_create_shortcut(BaseModel):
     short_cut_key: str
     empresa_id: int
     usuario_id: int
-    phrase: Optional[str] = None
+    phrase: str
     position: Optional[int] = None
 
 # Modelo para editar: Tudo é opcional. Por que? 

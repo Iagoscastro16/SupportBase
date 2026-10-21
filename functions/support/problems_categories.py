@@ -1,6 +1,9 @@
 # importação do conn vindo do config do diretorio raiz, atribuindo ao conn, basicamente as informações do banco
 from config import conn
 
+# erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
+from psycopg2.errors import UniqueViolation, ForeignKeyViolation
+
 #TODO: Refatoração do código com tratamento de erros.
 
 
@@ -18,6 +21,26 @@ def create_category_problem(problem_id,category_id,empresa_id):
             conn.commit()
             
             return cursor.rowcount
+    # a PK (problem_id, category_id) barra o mesmo vínculo duas vezes
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Essa categoria já está vinculada ao problema"}
+    # as FKs compostas barram problema ou categoria que não existe, ou que é de outra empresa
+    except ForeignKeyViolation as error:
+        print(error)
+        conn.rollback()
+        if error.diag.constraint_name == "problems_categories_problem_empresa_fkey":
+            mensagem = "Problema não encontrado nessa empresa"
+        elif error.diag.constraint_name == "problems_categories_category_empresa_fkey":
+            mensagem = "Categoria não encontrada nessa empresa"
+        elif error.diag.constraint_name == "problems_categories_empresa_id_fkey":
+            mensagem = "Empresa não encontrada"
+        else:
+            mensagem = "Problema, categoria ou empresa inválido"
+        return {"success": False,
+                "errorMessage": mensagem}
     except Exception as error:
         print(error)
         conn.rollback()

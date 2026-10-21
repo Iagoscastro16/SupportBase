@@ -1,6 +1,9 @@
 #1.  importando a conexão com o banco
 from config import conn
 
+# erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
+from psycopg2.errors import UniqueViolation, ForeignKeyViolation
+
 # ValidatePosition verifica se o número é inteiro com o isinstance, tanto se é número inteiro quanto se está entre 1 e 9, depois dá select em um dos atalhos e verifica se aquele atalho está disponivel
 def validatePosition(position,empresa_id,usuario_id):
     # Primeira barreira: garante que position é um inteiro. O isinstance evita erros silenciosos com strings como "5"
@@ -85,6 +88,30 @@ def createshortcut(short_cut_key,phrase,position,empresa_id,usuario_id):
         # commit obrigatório aqui porque o INSERT só é efetivado de fato após o commit
         conn.commit()
         return {"success": True}
+    # shortcuts tem duas UNIQUE (tecla e posição, ambas por usuário), então a mensagem depende de qual constraint barrou
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+        if error.diag.constraint_name == "shortcuts_short_cut_key_usuario_id_key":
+            mensagem = "Já existe um atalho com essa tecla"
+        elif error.diag.constraint_name == "shortcuts_position_usuario_id_key":
+            mensagem = "Já existe um atalho nessa posição"
+        else:
+            mensagem = "Atalho duplicado"
+        return {"success": False,
+                "errorMessage": mensagem}
+    # a FK composta (usuario_id, empresa_id) barra usuário que não existe ou que é de outra empresa
+    except ForeignKeyViolation as error:
+        print(error)
+        conn.rollback()
+        if error.diag.constraint_name == "shortcuts_usuario_empresa_fkey":
+            mensagem = "Usuário não encontrado nessa empresa"
+        elif error.diag.constraint_name == "shortcuts_empresa_id_fkey":
+            mensagem = "Empresa não encontrada"
+        else:
+            mensagem = "Empresa ou usuário inválido"
+        return {"success": False,
+                "errorMessage": mensagem}
     except Exception as error:
         # rollback garante que uma falha parcial não deixe a transação "presa"
         print(error)
@@ -204,6 +231,18 @@ def EditShortcut(id,short_cut_key,phrase, position, empresa_id, usuario_id):
                     "message": "Atalho atualizado com sucesso"
                     }
     
+    # o UPDATE não altera empresa_id nem usuario_id, então nenhuma FK pode falhar aqui, só as UNIQUE (mesma regra do createshortcut)
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+        if error.diag.constraint_name == "shortcuts_short_cut_key_usuario_id_key":
+            mensagem = "Já existe um atalho com essa tecla"
+        elif error.diag.constraint_name == "shortcuts_position_usuario_id_key":
+            mensagem = "Já existe um atalho nessa posição"
+        else:
+            mensagem = "Atalho duplicado"
+        return {"success": False,
+                "errorMessage": mensagem}
     except Exception as error:
         # Rollback para desfazer qualquer alteração pendente em caso de erro
         print(error)
