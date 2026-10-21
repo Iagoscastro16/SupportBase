@@ -1,6 +1,9 @@
 # importação do conn vindo do config do diretorio raiz, atribuindo ao conn, basicamente as informações do banco
 from config import conn
 
+# erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
+from psycopg2.errors import UniqueViolation, ForeignKeyViolation
+
 # no mais, é um CRUD básico
 
 def create_category(name,empresa_id):
@@ -22,6 +25,20 @@ def create_category(name,empresa_id):
             conn.commit()
 
             return result["id"] if result else None
+    # o índice único olha o nome sem caixa e sem espaços, e não olha `ativo`: a categoria que ocupa o nome pode estar inativa
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+
+        return {"success": False,
+                "errorMessage": "Já existe uma categoria com esse nome (ela pode estar inativa, nesse caso é só reativar)"}
+    # empresa_id que não existe na tabela empresa
+    except ForeignKeyViolation as error:
+        print(error)
+        conn.rollback()
+
+        return {"success": False,
+                "errorMessage": "Empresa não encontrada"}
     except Exception as error:
         print(error)
         conn.rollback()
@@ -50,6 +67,13 @@ def edit_categories(id,name,empresa_id):
 
             return cursor.rowcount
 
+    # mesma regra do create: o novo nome não pode colidir com outra categoria da empresa, ativa ou inativa
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+
+        return {"success": False,
+                "errorMessage": "Já existe uma categoria com esse nome (ela pode estar inativa, nesse caso é só reativar)"}
     except Exception as error:
         print(error)
         conn.rollback()
@@ -59,9 +83,7 @@ def edit_categories(id,name,empresa_id):
     
 
 
-# retorna todas as categorias
-# TODO: Verificar se vai ser necessario a implementação de diferentes formas de visualização das categorias
-
+# retorna as categorias de acordo com o filtro escolhido
 def list_categories(empresa_id,incluir_inativo=False):
 
     filtro = "WHERE empresa_id = %s"
