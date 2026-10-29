@@ -4,10 +4,7 @@ from config import conn
 # erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
 from psycopg2.errors import UniqueViolation, ForeignKeyViolation
 
-#TODO: Refatoração do código com tratamento de erros.
-
-
-# Fora o list, é um crud basico também
+# Fora o list, é um crud também
 def create_category_problem(problem_id,category_id,empresa_id):
     
     try:
@@ -19,8 +16,8 @@ def create_category_problem(problem_id,category_id,empresa_id):
                         )
 
             conn.commit()
-            
-            return cursor.rowcount
+
+            return {"success": True}
     # a PK (problem_id, category_id) barra o mesmo vínculo duas vezes
     except UniqueViolation as error:
         print(error)
@@ -59,8 +56,13 @@ def delete_category_problem(problem_id,category_id,empresa_id):
                         )
             
             conn.commit()
-            
-            return cursor.rowcount
+
+            # rowcount 0 = esse vínculo não existe (ou é de outra empresa)
+            if cursor.rowcount == 0:
+                return {"success": False,
+                        "errorMessage": "Vínculo não encontrado"}
+
+            return {"success": True}
     except Exception as error:
         print(error)
         conn.rollback()
