@@ -59,9 +59,18 @@ def validatePosition(position,empresa_id,usuario_id):
 
 #2. criando a função de atribuir tecla a frase
 def createshortcut(short_cut_key,phrase,position,empresa_id,usuario_id):
-    if not short_cut_key or not phrase:
+    # limpa os espaços das pontas e rejeita vazio: " " passava no "if not", porque a string não é vazia
+    # a tecla NÃO vai para maiúsculo/minúsculo: Ctrl e ctrl podem ser atalhos diferentes (decisão do projeto)
+    short_cut_key = short_cut_key.strip()
+    if not short_cut_key:
         return {"success": False,
-                    "errorMessage": "atalho ou frase não podem ser vazios"}
+                "errorMessage": "A tecla do atalho não pode ser vazia"}
+
+    phrase = phrase.strip()
+    if not phrase:
+        return {"success": False,
+                "errorMessage": "A frase do atalho não pode ser vazia"}
+
     #anotação pq foi dificil fazer, aqui eu estou aproveitando o que veio da função validatePosition, ele já verifica o número do position e no dicionario eu já chamo o erro
     # Reprova cedo: se a posição for inválida, nem chega a abrir conexão para o INSERT
     if position is not None:
@@ -199,8 +208,27 @@ def EditShortcut(id,short_cut_key,phrase, position, empresa_id, usuario_id):
     # Função orquestradora do fluxo de edição: busca o atalho, valida a posição, atualiza e commita
     # Padrão diferente do createshortcut: aqui o cursor é criado uma vez e repassado para as funções auxiliares,
     # evitando abrir e fechar cursor várias vezes dentro da mesma operação
-    #TODO: createshortcut, não há validação de short_cut_key e phrase vazios/None, Tratar disso futuramente
-    
+
+    # sem nenhum campo, o UPDATE rodaria sem mudar nada e devolveria sucesso, o que enganaria quem chamou
+    if short_cut_key is None and phrase is None and position is None:
+        return {"success": False,
+                "errorMessage": "Nenhum campo para atualizar"}
+
+    # regra "se veio, valida": o is not None vem antes do strip(), porque None é um valor legítimo aqui (não alterar)
+    # uma string vazia não é None: o COALESCE gravaria "" por cima do valor antigo, então vazio é erro
+    # (a posição já é validada mais abaixo, pelo validateEditPosition)
+    if short_cut_key is not None:
+        short_cut_key = short_cut_key.strip()
+        if not short_cut_key:
+            return {"success": False,
+                    "errorMessage": "A tecla do atalho não pode ficar vazia, só pode ser trocada por outro valor"}
+
+    if phrase is not None:
+        phrase = phrase.strip()
+        if not phrase:
+            return {"success": False,
+                    "errorMessage": "A frase do atalho não pode ficar vazia, só pode ser trocada por outro valor"}
+
     cursor = None
     try:
         cursor = conn.cursor()
@@ -227,9 +255,7 @@ def EditShortcut(id,short_cut_key,phrase, position, empresa_id, usuario_id):
         else:
             # Só commita depois que confirmou que o UPDATE afetou alguma linha
             conn.commit()
-            return {"success": True,
-                    "message": "Atalho atualizado com sucesso"
-                    }
+            return {"success": True}
     
     # o UPDATE não altera empresa_id nem usuario_id, então nenhuma FK pode falhar aqui, só as UNIQUE (mesma regra do createshortcut)
     except UniqueViolation as error:
@@ -332,7 +358,15 @@ def get_shortcut(id,empresa_id,usuario_id):
             cursor.execute('''
             SELECT id, created_at, short_cut_key, phrase, position FROM shortcuts WHERE id = %s and empresa_id = %s and usuario_id = %s
             ''', (id,empresa_id,usuario_id))
-            return cursor.fetchone()
+            data = cursor.fetchone()
+
+            # fetchone devolve None quando não há linha: não é erro do banco, só não existe (ou é de outro usuário)
+            if data is None:
+                return {"success": False,
+                        "errorMessage": "Atalho não encontrado"}
+
+            return {"success": True,
+                    "data": data}
     except Exception as error:
         print(error)
         conn.rollback()
@@ -361,9 +395,7 @@ def deleteshortcut(id,empresa_id,usuario_id):
                     }
         
         conn.commit()
-        return {"success": True,
-                "message": "Atalho deletado com sucesso"
-                } 
+        return {"success": True}
     except Exception as error:
         # Rollback por segurança — se algo quebrou no meio do caminho, nada deve ser persistido
         print(error)
