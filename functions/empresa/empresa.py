@@ -1,4 +1,9 @@
+import re
+
 from config import conn
+
+# erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
+from psycopg2.errors import UniqueViolation
 
 def create_empresa(razao_social,nome_fantasia,cnpj):
 
@@ -6,11 +11,12 @@ def create_empresa(razao_social,nome_fantasia,cnpj):
     # strings são imutáveis, então o resultado precisa voltar para a variável
     cnpj = cnpj.strip().upper()
 
-    # Verifica se está no tamanho certo
-    if len(cnpj) != 14:
+    # Verifica o formato: exatamente 14 caracteres, só letras maiúsculas (A-Z) e números
+    # o fullmatch exige que a string inteira bata com o padrão, e o len sozinho deixava passar algo como "!!!!!!!!!!!!!!"
+    if not re.fullmatch(r"[0-9A-Z]{14}", cnpj):
         return {
             "success": False,
-            "errorMessage": "O CNPJ deve ter 14 caracteres"
+            "errorMessage": "O CNPJ deve ter 14 caracteres, só letras e números"
         }
 
     # Verifica se a razao social veio vazia
@@ -21,6 +27,10 @@ def create_empresa(razao_social,nome_fantasia,cnpj):
             "errorMessage": "Campo razão social não pode estar vazio"
         }
 
+    # nome fantasia é opcional: se vier vazio (ou só espaços), vira None para o banco gravar NULL e não uma string vazia
+    # o is not None vem antes do strip(), porque None.strip() levanta AttributeError
+    if nome_fantasia is not None:
+        nome_fantasia = nome_fantasia.strip() or None
 
     try:
         with conn.cursor() as cursor:
@@ -35,11 +45,66 @@ def create_empresa(razao_social,nome_fantasia,cnpj):
 
             return {"success": True,
                     "id": result["id"]}
+    # o único UNIQUE que o create pode violar é o do cnpj
+    except UniqueViolation as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Já existe uma empresa com esse CNPJ"}
     except Exception as error:
         print(error)
         conn.rollback()
         return {"success": False,
                 "errorMessage":"Não foi possível cadastrar uma nova empresa"}
+
+
+# edição parcial com COALESCE: o que vier None mantém o valor antigo
+# por isso nome_fantasia só pode ser trocado por outro valor, não limpado (None = "não mexe")
+# o cnpj não é editável: a empresa é a raiz do tenant e o cnpj quase nunca muda (YAGNI)
+def edit_empresa(id,razao_social=None,nome_fantasia=None):
+
+    # sem nenhum campo, o UPDATE rodaria sem mudar nada e devolveria sucesso, o que enganaria quem chamou
+    if razao_social is None and nome_fantasia is None:
+        return {"success": False,
+                "errorMessage": "Nenhum campo para atualizar"}
+
+    # regra "se veio, valida": o is not None vem antes do strip(), porque None é um valor legítimo aqui (não alterar)
+    if razao_social is not None:
+        razao_social = razao_social.strip()
+        if not razao_social:
+            return {"success": False,
+                    "errorMessage": "Campo razão social não pode estar vazio"}
+
+    if nome_fantasia is not None:
+        nome_fantasia = nome_fantasia.strip()
+        if not nome_fantasia:
+            return {"success": False,
+                    "errorMessage": "Nome fantasia não pode ficar vazio, só pode ser trocado por outro valor"}
+
+    try:
+        with conn.cursor() as cursor:
+
+            # sem filtro por empresa_id: o próprio id é o tenant
+            cursor.execute('''
+            UPDATE empresa
+            SET razao_social = COALESCE(%s, razao_social),
+                nome_fantasia = COALESCE(%s, nome_fantasia)
+            WHERE id = %s
+                        ''',(razao_social,nome_fantasia,id))
+
+            conn.commit()
+
+            # rowcount 0 = o id não existe
+            if cursor.rowcount == 0:
+                return {"success": False,
+                        "errorMessage": "Empresa não encontrada"}
+
+            return {"success": True}
+    except Exception as error:
+        print(error)
+        conn.rollback()
+        return {"success": False,
+                "errorMessage": "Não foi possível editar a empresa"}
 
 
 # retorna todas as empresas. Aqui não existe filtro por empresa_id: a própria empresa é o tenant
