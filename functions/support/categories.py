@@ -4,7 +4,7 @@ from config import conn
 # erros do banco que o usuário consegue corrigir, tratados à parte do except genérico
 from psycopg2.errors import UniqueViolation, ForeignKeyViolation
 
-# no mais, é um CRUD básico
+# no mais, é um CRUD
 
 def create_category(name,empresa_id):
     # segunda camada: o service não confia que quem o chama já limpou o nome (ex.: testes ou outro service)
@@ -24,7 +24,8 @@ def create_category(name,empresa_id):
 
             conn.commit()
 
-            return result["id"] if result else None
+            return {"success": True,
+                    "id": result["id"]}
     # o índice único olha o nome sem caixa e sem espaços, e não olha `ativo`: a categoria que ocupa o nome pode estar inativa
     except UniqueViolation as error:
         print(error)
@@ -65,7 +66,12 @@ def edit_categories(id,name,empresa_id):
             
             conn.commit()
 
-            return cursor.rowcount
+            # rowcount 0 = o id não existe, ou pertence a outra empresa
+            if cursor.rowcount == 0:
+                return {"success": False,
+                        "errorMessage": "Categoria não encontrada"}
+
+            return {"success": True}
 
     # mesma regra do create: o novo nome não pode colidir com outra categoria da empresa, ativa ou inativa
     except UniqueViolation as error:
@@ -117,7 +123,15 @@ def get_category_id(id,empresa_id):
             ''',(id,empresa_id)
             )
 
-            return cursor.fetchone()
+            data = cursor.fetchone()
+
+            # fetchone devolve None quando não há linha: não é erro do banco, só não existe (ou é de outra empresa)
+            if data is None:
+                return {"success": False,
+                        "errorMessage": "Categoria não encontrada"}
+
+            return {"success": True,
+                    "data": data}
     except Exception as error:
         print(error)
         conn.rollback()
@@ -138,8 +152,13 @@ def delete_category(id,empresa_id):
                         
             conn.commit()
 
-            return cursor.rowcount
-        
+            # rowcount 0 = o id não existe, ou pertence a outra empresa
+            if cursor.rowcount == 0:
+                return {"success": False,
+                        "errorMessage": "Categoria não encontrada"}
+
+            return {"success": True}
+
     except Exception as error:
         print(error)
         conn.rollback()
